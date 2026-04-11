@@ -1,16 +1,20 @@
 import uvicorn
 from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
 from app.routers import templates, static_files, router, api_router
 from app.config import get_settings
 from contextlib import asynccontextmanager
+import app.models  # noqa: F401 — registers all SQLModel tables
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from app.database import create_db_and_tables
+    from app.cli import seed
     create_db_and_tables()
+    seed()
     yield
 
 
@@ -19,7 +23,15 @@ app = FastAPI(middleware=[
     Middleware(SessionMiddleware, secret_key=get_settings().secret_key)
 ],
     lifespan=lifespan
-)   
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(router)
 app.include_router(api_router)
