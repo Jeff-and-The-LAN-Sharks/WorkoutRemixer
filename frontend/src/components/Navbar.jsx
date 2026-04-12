@@ -2,8 +2,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const links = [
+  { to: '/home', label: 'Home' },
   { to: '/routines', label: 'Routines' },
   { to: '/exercises', label: 'Exercises' },
+  { to: '/food', label: 'Nutrition' },
   { to: '/history', label: 'History' },
 ]
 
@@ -19,7 +21,7 @@ export default function Navbar() {
       background: 'var(--surface)',
       position: 'sticky', top: 0, zIndex: 50,
     }}>
-      <Link to="/routines" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <Link to="/home" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div style={{
           width: 28, height: 28, background: 'var(--accent)',
           borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -33,13 +35,13 @@ export default function Navbar() {
         </span>
       </Link>
 
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
         {links.map(l => (
           <Link key={l.to} to={l.to} style={{
-            padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+            padding: '6px 12px', borderRadius: 8, fontSize: 13, fontWeight: 500,
             textDecoration: 'none', transition: 'all 0.15s',
-            color: pathname.startsWith(l.to) ? 'var(--text)' : 'var(--muted)',
-            background: pathname.startsWith(l.to) ? 'var(--surface2)' : 'transparent',
+            color: pathname === l.to || (l.to !== '/home' && pathname.startsWith(l.to)) ? 'var(--text)' : 'var(--muted)',
+            background: pathname === l.to || (l.to !== '/home' && pathname.startsWith(l.to)) ? 'var(--surface2)' : 'transparent',
           }}>
             {l.label}
           </Link>
@@ -47,14 +49,8 @@ export default function Navbar() {
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {user && (
-          <span style={{ fontSize: 13, color: 'var(--muted)' }}>
-            {user.username}
-          </span>
-        )}
-        <button className="btn btn-ghost" onClick={logout} style={{ padding: '6px 14px' }}>
-          Logout
-        </button>
+        {user && <span style={{ fontSize: 13, color: 'var(--muted)' }}>{user.username}</span>}
+        <button className="btn btn-ghost" onClick={logout} style={{ padding: '6px 14px' }}>Logout</button>
       </div>
     </header>
   )

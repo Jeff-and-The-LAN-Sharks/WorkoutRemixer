@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../api/client'
+import Stars from '../components/Stars'
 
 const MUSCLE_GROUPS = ['All', 'Arms', 'Chest', 'Back', 'Shoulders', 'Legs', 'Core', 'Full Body']
 const DIFFICULTY_COLOR = { beginner: 'badge-green', intermediate: 'badge-yellow', advanced: 'badge-red' }
@@ -11,37 +12,31 @@ function VideoModal({ exercise, onClose }) {
         background: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 18, width: '100%', maxWidth: 620, overflow: 'hidden',
       }}>
-        {/* Video */}
         <div style={{ position: 'relative', paddingBottom: '56.25%', background: '#000' }}>
           {exercise.video_id ? (
             <iframe
               src={`https://www.youtube.com/embed/${exercise.video_id}?autoplay=1&mute=1&rel=0`}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-              allow="autoplay; encrypted-media"
-              allowFullScreen
+              allow="autoplay; encrypted-media" allowFullScreen
             />
           ) : (
-            <div style={{
-              position: 'absolute', inset: 0, display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: 'var(--muted)',
-            }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>
               <p style={{ fontSize: 14 }}>No video available</p>
             </div>
           )}
         </div>
-
-        {/* Info */}
         <div style={{ padding: '20px 24px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
             <div>
               <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 22, fontWeight: 600, marginBottom: 8 }}>
                 {exercise.name}
               </h2>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span className="badge badge-purple">{exercise.muscle_group}</span>
                 <span className={`badge ${DIFFICULTY_COLOR[exercise.difficulty] || 'badge-green'}`}>
                   {exercise.difficulty}
                 </span>
+                <Stars difficulty={exercise.difficulty} />
               </div>
             </div>
             <button onClick={onClose} className="btn btn-ghost" style={{ padding: '6px 10px', fontSize: 18, lineHeight: 1 }}>✕</button>
@@ -75,14 +70,9 @@ export default function Exercises() {
       <h1 className="page-title">Exercise Library</h1>
       <p className="page-sub">Click any exercise to watch the tutorial video and see instructions.</p>
 
-      {/* Search + filter */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
-        <input
-          className="input" style={{ maxWidth: 260 }}
-          placeholder="Search exercises…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        <input className="input" style={{ maxWidth: 260 }} placeholder="Search exercises…"
+          value={search} onChange={e => setSearch(e.target.value)} />
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {MUSCLE_GROUPS.map(g => (
             <button key={g} onClick={() => setFilter(g)} style={{
@@ -108,48 +98,40 @@ export default function Exercises() {
         <div className="grid-3">
           {filtered.map(ex => (
             <div key={ex.id} className="card" onClick={() => setSelected(ex)}
-              style={{ cursor: 'pointer', transition: 'all 0.15s' }}
+              style={{ cursor: 'pointer', transition: 'all 0.15s', padding: 0, overflow: 'hidden' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.transform = '' }}
             >
               {/* Thumbnail */}
               {ex.video_id && (
-                <div style={{ position: 'relative', marginBottom: 12, borderRadius: 8, overflow: 'hidden', aspectRatio: '16/9', background: '#000' }}>
-                  <img
-                    src={`https://img.youtube.com/vi/${ex.video_id}/mqdefault.jpg`}
-                    alt={ex.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                <div style={{ position: 'relative', paddingBottom: '52%', background: '#000' }}>
+                  <img src={`https://img.youtube.com/vi/${ex.video_id}/mqdefault.jpg`} alt={ex.name}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => { e.target.parentElement.style.display = 'none' }}
                   />
-                  {/* Play button overlay */}
-                  <div style={{
-                    position: 'absolute', inset: 0, display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.3)',
-                    transition: 'background 0.15s',
-                  }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      background: 'rgba(124,110,245,0.9)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                      </svg>
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(124,110,245,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600 }}>{ex.name}</h3>
-                <span className={`badge ${DIFFICULTY_COLOR[ex.difficulty] || 'badge-green'}`}>
-                  {ex.difficulty}
-                </span>
+              <div style={{ padding: '14px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.3 }}>{ex.name}</h3>
+                  <span className={`badge ${DIFFICULTY_COLOR[ex.difficulty] || 'badge-green'}`} style={{ flexShrink: 0, marginLeft: 8 }}>
+                    {ex.difficulty}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span className="badge badge-purple">{ex.muscle_group}</span>
+                  <Stars difficulty={ex.difficulty} />
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+                  {ex.description.length > 75 ? ex.description.slice(0, 75) + '…' : ex.description}
+                </p>
               </div>
-              <span className="badge badge-purple" style={{ marginBottom: 8 }}>{ex.muscle_group}</span>
-              <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.5, marginTop: 6 }}>
-                {ex.description.length > 80 ? ex.description.slice(0, 80) + '…' : ex.description}
-              </p>
             </div>
           ))}
         </div>
