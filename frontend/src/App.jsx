@@ -9,6 +9,7 @@ import RoutineDetail from './pages/RoutineDetail'
 import Workout from './pages/Workout'
 import History from './pages/History'
 import Food from './pages/Food'
+import Profile from './pages/Profile'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -17,12 +18,7 @@ function ProtectedRoute({ children }) {
 }
 
 function Layout({ children }) {
-  return (
-    <>
-      <Navbar />
-      <main>{children}</main>
-    </>
-  )
+  return (<><Navbar /><main>{children}</main></>)
 }
 
 export default function App() {
@@ -32,13 +28,14 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<ProtectedRoute><Layout><Home /></Layout></ProtectedRoute>} />
-          <Route path="/exercises" element={<ProtectedRoute><Layout><Exercises /></Layout></ProtectedRoute>} />
-          <Route path="/routines" element={<ProtectedRoute><Layout><Routines /></Layout></ProtectedRoute>} />
-          <Route path="/routines/:id" element={<ProtectedRoute><Layout><RoutineDetail /></Layout></ProtectedRoute>} />
+          <Route path="/home"          element={<ProtectedRoute><Layout><Home /></Layout></ProtectedRoute>} />
+          <Route path="/exercises"     element={<ProtectedRoute><Layout><Exercises /></Layout></ProtectedRoute>} />
+          <Route path="/routines"      element={<ProtectedRoute><Layout><Routines /></Layout></ProtectedRoute>} />
+          <Route path="/routines/:id"  element={<ProtectedRoute><Layout><RoutineDetail /></Layout></ProtectedRoute>} />
           <Route path="/workout/:routineId" element={<ProtectedRoute><Workout /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
-          <Route path="/food" element={<ProtectedRoute><Layout><Food /></Layout></ProtectedRoute>} />
+          <Route path="/history"       element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
+          <Route path="/food"          element={<ProtectedRoute><Layout><Food /></Layout></ProtectedRoute>} />
+          <Route path="/profile"       element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
