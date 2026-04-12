@@ -1,39 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../api/client'
 
-// ── Rep counter config per exercise ─────────────────────────────────────────
-const EXERCISE_CONFIGS = {
-  'bicep curl':      { joints: [11, 13, 15], downAngle: 160, upAngle: 50 },
-  'hammer curl':     { joints: [11, 13, 15], downAngle: 160, upAngle: 50 },
-  'tricep dip':      { joints: [11, 13, 15], downAngle: 50,  upAngle: 155 },
-  'squat':           { joints: [23, 25, 27], downAngle: 100, upAngle: 160 },
-  'lunge':           { joints: [23, 25, 27], downAngle: 100, upAngle: 160 },
-  'push up':         { joints: [11, 13, 15], downAngle: 90,  upAngle: 155 },
-  'shoulder press':  { joints: [13, 11, 23], downAngle: 85,  upAngle: 155 },
-  'lateral raise':   { joints: [13, 11, 23], downAngle: 25,  upAngle: 75  },
-  'deadlift':        { joints: [11, 23, 25], downAngle: 90,  upAngle: 160 },
-  'romanian deadlift': { joints: [11, 23, 25], downAngle: 90, upAngle: 160 },
-  'calf raise':      { joints: [25, 27, 31], downAngle: 80,  upAngle: 110 },
-}
+const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-function getConfig(name) {
-  if (!name) return null
-  const key = name.toLowerCase()
-  return EXERCISE_CONFIGS[key] || null
-}
-
-function calcAngle(A, B, C) {
-  const rad = Math.atan2(C.y - B.y, C.x - B.x) - Math.atan2(A.y - B.y, A.x - B.x)
-  let angle = Math.abs(rad * 180 / Math.PI)
-  if (angle > 180) angle = 360 - angle
-  return Math.round(angle)
-}
-
-// ── AI Chat component ────────────────────────────────────────────────────────
-function AIChat({ contextRef }) {
+// ── AI Chat ──────────────────────────────────────────────────────────────────
+function AIChat({ context }) {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hey! I'm your AI coach. Start the camera and tell me what exercise you're doing. I'll help with form and feedback!" }
+    { role: 'assistant', content: "Hey! I'm your AI coach. Ask me about form, technique, nutrition — anything to help your workout!" }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -42,500 +16,466 @@ function AIChat({ contextRef }) {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   const send = async (text) => {
-    if (!text.trim() || loading) return
+    if (!text?.trim() || loading) return
     const userMsg = { role: 'user', content: text }
     setMessages(m => [...m, userMsg])
     setInput('')
     setLoading(true)
     try {
-      const history = [...messages, userMsg].slice(-10)
+      const allMsgs = [...messages, userMsg]
       const res = await api.post('/chat', {
-        messages: history.map(m => ({ role: m.role, content: m.content })),
-        exercise_context: contextRef.current || null,
+        messages: allMsgs.map(m => ({ role: m.role, content: m.content })),
+        exercise_context: context,
       })
       setMessages(m => [...m, { role: 'assistant', content: res.data.reply }])
     } catch {
-      setMessages(m => [...m, { role: 'assistant', content: 'Connection error. Try again.' }])
+      setMessages(m => [...m, { role: 'assistant', content: 'AI coach unavailable right now.' }])
     } finally { setLoading(false) }
   }
 
+  const QUICK = ['How is my form for this?', 'Tips to improve?', 'What muscles does this work?', 'How many sets should I do?']
+
   return (
-    <div style={{
-      width: '340px', flexShrink: 0, display: 'flex', flexDirection: 'column',
-      background: 'var(--surface)', borderLeft: '1px solid var(--border)',
-      height: '100%',
-    }}>
-      {/* Header */}
-      <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{
-          width: 30, height: 30, borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--accent), #a78bfa)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '12px', fontWeight: 600, color: 'white',
-        }}>AI</div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white', flexShrink: 0 }}>AI</div>
         <div>
-          <div style={{ fontSize: '14px', fontWeight: 500 }}>Form Coach</div>
-          <div style={{ fontSize: '11px', color: 'var(--muted)' }}>Powered by Llama</div>
+          <p style={{ fontSize: 13, fontWeight: 500 }}>Form Coach</p>
+          <p style={{ fontSize: 11, color: 'var(--green)' }}>● Online</p>
         </div>
       </div>
 
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'thin' }}>
         {messages.map((m, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-            <div style={{ fontSize: '10px', color: 'var(--muted2)', marginBottom: '3px', padding: '0 4px' }}>
-              {m.role === 'user' ? 'You' : 'Form Coach'}
-            </div>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+            <span style={{ fontSize: 10, color: 'var(--muted2)' }}>{m.role === 'user' ? 'You' : 'Form Coach'}</span>
             <div style={{
-              maxWidth: '88%', padding: '9px 13px', borderRadius: m.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
-              fontSize: '13px', lineHeight: 1.5,
+              padding: '9px 13px',
+              borderRadius: m.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
               background: m.role === 'user' ? 'var(--accent)' : 'var(--surface2)',
-              color: m.role === 'user' ? 'white' : 'var(--text)',
               border: m.role === 'user' ? 'none' : '1px solid var(--border)',
-            }}>
-              {m.content}
-            </div>
+              fontSize: 13, lineHeight: 1.55, maxWidth: '90%',
+              color: m.role === 'user' ? 'white' : 'var(--text)',
+            }}>{m.content}</div>
           </div>
         ))}
         {loading && (
-          <div style={{ display: 'flex', gap: '4px', padding: '10px 14px', background: 'var(--surface2)', borderRadius: '4px 12px 12px 12px', width: 'fit-content' }}>
-            {[0, 0.2, 0.4].map((d, i) => (
-              <div key={i} style={{
-                width: 6, height: 6, borderRadius: '50%', background: 'var(--muted)',
-                animation: 'bounce 1.2s infinite', animationDelay: `${d}s`,
-              }}/>
-            ))}
+          <div style={{ display: 'flex', gap: 4, padding: '10px 13px', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: '4px 12px 12px 12px', width: 'fit-content' }}>
+            {[0,1,2].map(i => <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--muted)', display: 'block', animation: `bounce 1.2s ${i*0.2}s infinite` }}/>)}
           </div>
         )}
         <div ref={bottomRef}/>
       </div>
 
-      {/* Input */}
-      <div style={{ padding: '10px 14px', borderTop: '1px solid var(--border)', display: 'flex', gap: '8px' }}>
-        <textarea
-          style={{
-            flex: 1, background: 'var(--surface2)', border: '1px solid var(--border)',
-            borderRadius: '10px', padding: '9px 12px', fontSize: '13px', color: 'var(--text)',
-            fontFamily: 'Inter, sans-serif', resize: 'none', outline: 'none', maxHeight: '80px',
+      <div style={{ padding: '6px 12px', borderTop: '1px solid var(--border)', display: 'flex', gap: 5, flexWrap: 'wrap', flexShrink: 0 }}>
+        {QUICK.map(q => (
+          <button key={q} onClick={() => send(q)} style={{
+            background: 'var(--surface2)', border: '1px solid var(--border)',
+            color: 'var(--muted)', borderRadius: 20, padding: '3px 10px',
+            fontSize: 11, cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+            transition: 'all 0.15s',
           }}
-          placeholder="Ask about your form…"
-          value={input}
+            onMouseEnter={e => { e.target.style.borderColor = 'var(--accent)'; e.target.style.color = 'var(--accent)' }}
+            onMouseLeave={e => { e.target.style.borderColor = ''; e.target.style.color = '' }}
+          >{q}</button>
+        ))}
+      </div>
+
+      <div style={{ padding: '10px 14px', borderTop: '1px solid var(--border)', display: 'flex', gap: 8, flexShrink: 0 }}>
+        <textarea
           rows={1}
+          value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-        />
-        <button
-          onClick={() => send(input)}
-          disabled={!input.trim() || loading}
+          placeholder="Ask your coach…"
           style={{
-            width: 36, height: 36, background: 'var(--accent)', border: 'none',
-            borderRadius: '9px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, opacity: (!input.trim() || loading) ? 0.4 : 1,
-          }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
-            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
-          </svg>
+            flex: 1, background: 'var(--surface2)', border: '1px solid var(--border)',
+            borderRadius: 10, padding: '8px 12px', fontSize: 13, color: 'var(--text)',
+            fontFamily: 'Inter, sans-serif', resize: 'none', outline: 'none',
+            maxHeight: 80, overflowY: 'auto',
+          }}
+        />
+        <button onClick={() => send(input)} disabled={!input.trim() || loading} style={{
+          width: 36, height: 36, background: 'var(--accent)', border: 'none',
+          borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', flexShrink: 0,
+          opacity: !input.trim() || loading ? 0.4 : 1, transition: 'opacity 0.15s',
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
         </button>
       </div>
-      <style>{`@keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }`}</style>
     </div>
   )
 }
 
-// ── Main Workout page ────────────────────────────────────────────────────────
+// ── Main Workout Page ─────────────────────────────────────────────────────────
 export default function Workout() {
   const { routineId } = useParams()
   const navigate = useNavigate()
 
   const [routine, setRoutine] = useState(null)
   const [sessionId, setSessionId] = useState(null)
-  const [currentExIdx, setCurrentExIdx] = useState(0)
-  const [currentSet, setCurrentSet] = useState(1)
-  const [reps, setReps] = useState(0)
-  const [stage, setStage] = useState('down')
-  const [cameraReady, setCameraReady] = useState(false)
-  const [angle, setAngle] = useState(null)
-  const [feedback, setFeedback] = useState('Start the camera to begin')
-  const [feedbackColor, setFeedbackColor] = useState('var(--muted)')
-  const [restTimer, setRestTimer] = useState(null)
-  const [listening, setListening] = useState(false)
-  const [sessionStartTime, setSessionStartTime] = useState(null)
-  const [formScores, setFormScores] = useState([])
-  const [mediapipeLoaded, setMediapipeLoaded] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const videoRef = useRef(null)
-  const canvasRef = useRef(null)
-  const repsRef = useRef(0)
-  const stageRef = useRef('down')
-  const formScoresRef = useRef([])
-  const restTimerRef = useRef(null)
-  const aiContextRef = useRef('')
+  // Progress
+  const [exIdx, setExIdx] = useState(0)
+  const [setNum, setSetNum] = useState(1)
+  const [repCount, setRepCount] = useState(0)
+  const [done, setDone] = useState(false)
+  const [completedSets, setCompletedSets] = useState([])
 
-  // Load MediaPipe from CDN
+  // Timers
+  const [elapsed, setElapsed] = useState(0)
+  const [isResting, setIsResting] = useState(false)
+  const [restLeft, setRestLeft] = useState(0)
+  const [restTotal, setRestTotal] = useState(60)
+
+  const sessionIdRef = useRef(null)
+  const elapsedRef = useRef(null)
+  const restRef = useRef(null)
+
   useEffect(() => {
-    const scripts = [
-      'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js',
-      'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
-      'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js',
-    ]
-    let loaded = 0
-    scripts.forEach(src => {
-      if (document.querySelector(`script[src="${src}"]`)) { loaded++; if (loaded === 3) setMediapipeLoaded(true); return }
-      const s = document.createElement('script')
-      s.src = src
-      s.onload = () => { loaded++; if (loaded === 3) setMediapipeLoaded(true) }
-      document.head.appendChild(s)
-    })
-  }, [])
-
-  // Load routine + start session
-  useEffect(() => {
-    api.get(`/routines/${routineId}`).then(r => {
-      setRoutine(r.data)
-      return api.post('/sessions', { routine_id: parseInt(routineId) })
-    }).then(r => {
-      setSessionId(r.data.id)
-      setSessionStartTime(Date.now())
-    })
+    api.get(`/routines/${routineId}`)
+      .then(async r => {
+        setRoutine(r.data)
+        const sess = await api.post('/sessions', { routine_id: parseInt(routineId) })
+        setSessionId(sess.data.id)
+        sessionIdRef.current = sess.data.id
+        setLoading(false)
+      })
+      .catch(() => navigate('/routines'))
   }, [routineId])
 
-  // Update AI context when exercise changes
+  // Elapsed timer
   useEffect(() => {
-    if (!routine) return
-    const ex = routine.exercises[currentExIdx]
-    if (ex) {
-      aiContextRef.current = `Exercise: ${ex.exercise_name} | Set ${currentSet}/${ex.sets} | Target reps: ${ex.target_reps} | Reps done: ${repsRef.current} | Angle: ${angle ?? 'unknown'}°`
+    elapsedRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
+    return () => clearInterval(elapsedRef.current)
+  }, [])
+
+  const currentEx = routine?.exercises[exIdx]
+
+  const buildContext = () => {
+    if (!currentEx) return ''
+    return `Routine: ${routine.name}\nExercise: ${currentEx.exercise_name} (${currentEx.muscle_group})\nSet: ${setNum} of ${currentEx.sets}\nReps completed: ${repCount} / target ${currentEx.target_reps}`
+  }
+
+  const adjustReps = (delta) => setRepCount(r => Math.max(0, r + delta))
+
+  const completeSet = async () => {
+    const newSet = {
+      exercise_name: currentEx.exercise_name,
+      set_number: setNum,
+      reps: repCount,
     }
-  }, [routine, currentExIdx, currentSet, angle])
+    setCompletedSets(s => [...s, newSet])
 
-  // Start camera + pose
-  const startCamera = useCallback(() => {
-    if (!mediapipeLoaded || !videoRef.current || !canvasRef.current) return
-    const { Pose, POSE_CONNECTIONS } = window
-    const { Camera } = window
-    const { drawConnectors, drawLandmarks } = window
-
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    canvas.width = 1280; canvas.height = 720
-
-    const pose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` })
-    pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 })
-
-    pose.onResults(results => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height)
-      if (!results.poseLandmarks) return
-
-      drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'rgba(124,110,245,0.7)', lineWidth: 2.5 })
-      drawLandmarks(ctx, results.poseLandmarks, { color: '#7c6ef5', fillColor: 'rgba(124,110,245,0.3)', lineWidth: 1.5, radius: 4 })
-
-      const lm = results.poseLandmarks
-      const ex = routine?.exercises[currentExIdx]
-      if (!ex) return
-
-      const config = getConfig(ex.exercise_name)
-      if (!config) return
-
-      const [ai, bi, ci] = config.joints
-      if (!lm[ai] || !lm[bi] || !lm[ci]) return
-
-      const currentAngle = calcAngle(lm[ai], lm[bi], lm[ci])
-      setAngle(currentAngle)
-
-      // Form scoring — penalise large deviations
-      const idealRange = config.upAngle - config.downAngle
-      const score = Math.max(0, Math.min(100, 100 - Math.abs(currentAngle - ((config.upAngle + config.downAngle) / 2)) / Math.abs(idealRange) * 100))
-      formScoresRef.current.push(score)
-
-      // Rep counting state machine
-      if (currentAngle > config.downAngle && stageRef.current === 'up') {
-        stageRef.current = 'down'
-        setStage('down')
-      }
-      if (currentAngle < config.upAngle && stageRef.current === 'down') {
-        stageRef.current = 'up'
-        setStage('up')
-        repsRef.current += 1
-        setReps(repsRef.current)
-      }
-
-      // Feedback
-      if (currentAngle > config.downAngle) { setFeedback('Ready position'); setFeedbackColor('var(--muted)') }
-      else if (currentAngle < config.upAngle) { setFeedback('Full range! Great work 💪'); setFeedbackColor('var(--green)') }
-      else { setFeedback('Keep going…'); setFeedbackColor('var(--yellow)') }
-
-      // Auto complete set when target reps reached
-      if (repsRef.current >= ex.target_reps && !restTimerRef.current) {
-        completeSet(ex)
-      }
-    })
-
-    const camera = new Camera(videoRef.current, {
-      onFrame: async () => await pose.send({ image: videoRef.current }),
-      width: 1280, height: 720,
-    })
-    camera.start().then(() => {
-      setCameraReady(true)
-      setFeedback('Tracking active — start your set!')
-      setFeedbackColor('var(--green)')
-    })
-  }, [mediapipeLoaded, routine, currentExIdx])
-
-  const completeSet = useCallback(async (ex) => {
-    const avgFormScore = formScoresRef.current.length
-      ? formScoresRef.current.reduce((a, b) => a + b, 0) / formScoresRef.current.length
-      : 0
-
-    // Save to backend
-    if (sessionId) {
-      await api.post(`/sessions/${sessionId}/sets`, {
-        exercise_id: ex.exercise_id,
-        reps_completed: repsRef.current,
-        form_score: Math.round(avgFormScore),
-        set_number: currentSet,
+    try {
+      await api.post(`/sessions/${sessionIdRef.current}/sets`, {
+        exercise_id: currentEx.exercise_id,
+        reps_completed: repCount,
+        form_score: 75,
+        set_number: setNum,
       })
-    }
+    } catch (e) { console.error(e) }
 
-    formScoresRef.current = []
-    repsRef.current = 0
-    setReps(0)
-    stageRef.current = 'down'
+    const isLastSet = setNum >= currentEx.sets
+    const isLastEx = exIdx >= routine.exercises.length - 1
 
-    const isLastSet = currentSet >= ex.sets
-    const isLastExercise = currentExIdx >= (routine?.exercises.length ?? 1) - 1
+    if (isLastSet && isLastEx) { finishWorkout(); return }
 
-    if (isLastSet && isLastExercise) {
-      finishWorkout()
-      return
-    }
+    // Start rest
+    const rest = currentEx.rest_seconds || 60
+    setRestTotal(rest)
+    setRestLeft(rest)
+    setIsResting(true)
+    setRepCount(0)
 
-    // Start rest timer
-    const restSecs = ex.rest_seconds || 60
-    setRestTimer(restSecs)
-    setFeedback(`Set complete! Rest for ${restSecs}s`)
-    setFeedbackColor('var(--accent)')
-
-    let remaining = restSecs
-    restTimerRef.current = setInterval(() => {
-      remaining -= 1
-      setRestTimer(remaining)
-      if (remaining <= 0) {
-        clearInterval(restTimerRef.current)
-        restTimerRef.current = null
-        setRestTimer(null)
-        if (isLastSet) {
-          setCurrentExIdx(i => i + 1)
-          setCurrentSet(1)
-        } else {
-          setCurrentSet(s => s + 1)
+    restRef.current = setInterval(() => {
+      setRestLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(restRef.current)
+          setIsResting(false)
+          if (isLastSet) {
+            setExIdx(i => i + 1)
+            setSetNum(1)
+          } else {
+            setSetNum(s => s + 1)
+          }
+          setRepCount(0)
+          return 0
         }
-        setFeedback('Rest over — start your next set!')
-        setFeedbackColor('var(--green)')
-      }
+        return prev - 1
+      })
     }, 1000)
-  }, [sessionId, currentSet, currentExIdx, routine])
+  }
+
+  const skipRest = () => {
+    clearInterval(restRef.current)
+    setIsResting(false)
+    const isLastSet = setNum >= currentEx.sets
+    if (isLastSet) { setExIdx(i => i + 1); setSetNum(1) }
+    else { setSetNum(s => s + 1) }
+    setRepCount(0)
+  }
 
   const finishWorkout = async () => {
-    if (!sessionId) return
-    const duration = Math.round((Date.now() - (sessionStartTime || Date.now())) / 1000)
-    await api.post(`/sessions/${sessionId}/complete`, { duration_seconds: duration })
-    navigate('/history')
+    clearInterval(elapsedRef.current)
+    try {
+      await api.post(`/sessions/${sessionIdRef.current}/complete`, { duration_seconds: elapsed })
+    } catch (e) { console.error(e) }
+    setDone(true)
   }
 
-  // Voice recognition
-  const startVoice = () => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SR) return alert('Voice recognition not supported in this browser. Try Chrome.')
-    const rec = new SR()
-    rec.continuous = false
-    rec.interimResults = false
-    setListening(true)
-    rec.onresult = e => {
-      const text = e.results[0][0].transcript.toLowerCase()
-      setFeedback(`Heard: "${text}" — matching exercise…`)
-      if (routine) {
-        const match = routine.exercises.findIndex(ex => text.includes(ex.exercise_name.toLowerCase()))
-        if (match !== -1) {
-          setCurrentExIdx(match)
-          setCurrentSet(1)
-          repsRef.current = 0; setReps(0)
-          setFeedback(`Switched to: ${routine.exercises[match].exercise_name}`)
-          setFeedbackColor('var(--green)')
-        } else {
-          setFeedback(`Couldn't find that exercise. Try saying the exact name.`)
-          setFeedbackColor('var(--yellow)')
-        }
-      }
-      setListening(false)
-    }
-    rec.onerror = () => setListening(false)
-    rec.onend = () => setListening(false)
-    rec.start()
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'var(--muted)' }}>Loading workout…</p>
+    </div>
+  )
+
+  // ── Done screen ──
+  if (done) {
+    const totalReps = completedSets.reduce((a, s) => a + s.reps, 0)
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 0, padding: 24 }}>
+        <div style={{ maxWidth: 480, width: '100%', textAlign: 'center' }}>
+          {/* Trophy */}
+          <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(34,211,160,0.12)', border: '2px solid var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, marginBottom: 8 }}>Workout Complete!</h1>
+          <p style={{ color: 'var(--muted)', fontSize: 15, marginBottom: 32 }}>
+            Great work finishing <strong style={{ color: 'var(--text)' }}>{routine?.name}</strong>
+          </p>
+
+          {/* Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 32 }}>
+            {[
+              { label: 'Duration', value: fmtTime(elapsed) },
+              { label: 'Sets done', value: completedSets.length },
+              { label: 'Total reps', value: totalReps },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 10px', textAlign: 'center' }}>
+                <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</p>
+                <p style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: 'var(--green)' }}>{value}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Completed sets list */}
+          {completedSets.length > 0 && (
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 16, marginBottom: 28, textAlign: 'left' }}>
+              <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Sets Completed</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {completedSets.map((s, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 10px', background: 'var(--surface2)', borderRadius: 8 }}>
+                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--surface3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--muted)', flexShrink: 0 }}>{i+1}</span>
+                    <span style={{ flex: 1, fontSize: 13 }}>{s.exercise_name}</span>
+                    <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 600 }}>{s.reps} reps</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <button className="btn btn-primary" onClick={() => navigate('/history')} style={{ padding: '10px 24px' }}>View History</button>
+            <button className="btn btn-ghost" onClick={() => navigate('/routines')} style={{ padding: '10px 24px' }}>Back to Routines</button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const currentExercise = routine?.exercises[currentExIdx]
+  // ── Rest screen ──
+  if (isResting) {
+    const progress = ((restTotal - restLeft) / restTotal) * 100
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 24 }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 2 }}>Rest Time</p>
+
+        {/* Circular timer */}
+        <div style={{ position: 'relative', width: 180, height: 180 }}>
+          <svg width="180" height="180" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
+            <circle cx="90" cy="90" r="80" fill="none" stroke="var(--surface2)" strokeWidth="8"/>
+            <circle cx="90" cy="90" r="80" fill="none"
+              stroke={restLeft <= 5 ? 'var(--red)' : restLeft <= 15 ? 'var(--yellow)' : 'var(--green)'}
+              strokeWidth="8" strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 80}`}
+              strokeDashoffset={`${2 * Math.PI * 80 * (1 - progress / 100)}`}
+              style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }}
+            />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{
+              fontSize: 52, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif",
+              color: restLeft <= 5 ? 'var(--red)' : restLeft <= 15 ? 'var(--yellow)' : 'var(--green)',
+              lineHeight: 1,
+            }}>{restLeft}</span>
+            <span style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>seconds</span>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: 16, fontWeight: 500, marginBottom: 6 }}>
+            {exIdx < routine.exercises.length - 1 && setNum >= currentEx?.sets
+              ? `Next: ${routine.exercises[exIdx + 1]?.exercise_name}`
+              : `Up next: Set ${setNum + 1} of ${currentEx?.exercise_name}`}
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--muted)' }}>Take a breath, hydrate, reset</p>
+        </div>
+
+        <button className="btn btn-ghost" onClick={skipRest} style={{ padding: '9px 24px' }}>
+          Skip Rest →
+        </button>
+      </div>
+    )
+  }
+
+  // ── Active workout ──
+  const progress = ((exIdx * (currentEx?.sets || 1) + (setNum - 1)) / (routine.exercises.reduce((a, e) => a + e.sets, 0))) * 100
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
-      {/* Top bar */}
-      <header style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 20px', height: '52px', borderBottom: '1px solid var(--border)',
-        background: 'var(--surface)', flexShrink: 0,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: '12px' }}
-            onClick={() => { if (confirm('End workout?')) finishWorkout() }}>
-            ← Back
-          </button>
-          <div style={{ height: '20px', width: '1px', background: 'var(--border)' }}/>
-          <span style={{ fontSize: '14px', fontWeight: 500 }}>{routine?.name ?? 'Workout'}</span>
-        </div>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
 
-        {currentExercise && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
-              Exercise <span style={{ color: 'var(--text)', fontWeight: 500 }}>{currentExIdx + 1}/{routine?.exercises.length}</span>
-            </span>
-            <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
-              Set <span style={{ color: 'var(--text)', fontWeight: 500 }}>{currentSet}/{currentExercise.sets}</span>
-            </span>
+      {/* Header */}
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 52, borderBottom: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0 }}>
+        <Link to={`/routines/${routineId}`} style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 13, textDecoration: 'none' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 600 }}>{routine?.name}</span>
+          {/* Elapsed timer */}
+          <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 13, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", color: 'var(--accent)' }}>
+            ⏱ {fmtTime(elapsed)}
           </div>
-        )}
-
-        <button className="btn btn-danger" style={{ padding: '5px 14px', fontSize: '12px' }}
-          onClick={() => { if (confirm('Finish workout now?')) finishWorkout() }}>
-          Finish
-        </button>
+        </div>
+        <button className="btn btn-danger" style={{ padding: '5px 12px', fontSize: 12 }} onClick={finishWorkout}>Finish</button>
       </header>
 
-      {/* Body */}
+      {/* Progress bar */}
+      <div style={{ height: 3, background: 'var(--surface2)', flexShrink: 0 }}>
+        <div style={{ height: '100%', background: 'var(--accent)', width: `${progress}%`, transition: 'width 0.5s ease' }}/>
+      </div>
+
+      {/* Main */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Camera side */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px', gap: '12px', overflow: 'hidden' }}>
 
-          {/* Camera view */}
-          <div style={{ flex: 1, position: 'relative', background: 'var(--surface)', borderRadius: '14px', border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <video ref={videoRef} style={{ display: 'none' }} autoPlay playsInline/>
-            <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
+        {/* Left — exercise */}
+        <div style={{ flex: '0 0 60%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-            {!cameraReady && (
-              <div style={{
-                position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center', gap: '16px',
-              }}>
-                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5">
-                  <path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
-                </svg>
-                <button
-                  className="btn btn-primary"
-                  style={{ fontSize: '14px', padding: '10px 24px' }}
-                  onClick={startCamera}
-                  disabled={!mediapipeLoaded || !routine}
-                >
-                  {!mediapipeLoaded ? 'Loading AI…' : !routine ? 'Loading routine…' : 'Start Camera'}
-                </button>
-              </div>
-            )}
+          {/* Video */}
+          {currentEx?.video_id && (
+            <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', flexShrink: 0 }}>
+              <iframe
+                key={currentEx.exercise_id}
+                src={`https://www.youtube.com/embed/${currentEx.video_id}?autoplay=1&mute=1&loop=1&rel=0&controls=1`}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
+          )}
 
-            {/* Overlays */}
-            {cameraReady && (
+          {/* Exercise info + rep counter */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+            {currentEx && (
               <>
-                <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '8px' }}>
-                  {angle !== null && (
-                    <div style={{ background: 'rgba(10,10,15,0.8)', border: '1px solid var(--border2)', borderRadius: '9px', padding: '7px 13px', fontSize: '13px' }}>
-                      Angle: <span style={{ color: 'var(--accent)', fontWeight: 600, fontSize: '15px' }}>{angle}°</span>
+                {/* Exercise header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                        Exercise {exIdx + 1} of {routine.exercises.length}
+                      </span>
                     </div>
-                  )}
+                    <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 26, fontWeight: 700, marginBottom: 6 }}>
+                      {currentEx.exercise_name}
+                    </h2>
+                    <span className="badge badge-purple">{currentEx.muscle_group}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 2 }}>Set</p>
+                    <p style={{ fontSize: 28, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", color: 'var(--accent)' }}>
+                      {setNum}<span style={{ color: 'var(--muted2)', fontSize: 16 }}>/{currentEx.sets}</span>
+                    </p>
+                  </div>
                 </div>
-                <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(245,101,101,0.15)', border: '1px solid rgba(245,101,101,0.3)', borderRadius: '9px', padding: '5px 11px', fontSize: '12px', color: '#f56565', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#f56565', animation: 'blink 1s infinite' }}/>
-                  LIVE
+
+                {/* Rep counter */}
+                <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px', marginBottom: 20, textAlign: 'center' }}>
+                  <p style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>
+                    Reps Completed
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, marginBottom: 16 }}>
+                    <button onClick={() => adjustReps(-1)} style={{
+                      width: 52, height: 52, borderRadius: '50%', border: '2px solid var(--border2)',
+                      background: 'var(--surface2)', color: 'var(--text)', fontSize: 24, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border2)'}
+                    >−</button>
+
+                    <div style={{ minWidth: 100, textAlign: 'center' }}>
+                      <span style={{
+                        fontSize: 72, fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1,
+                        color: repCount >= currentEx.target_reps ? 'var(--green)' : 'var(--text)',
+                        transition: 'color 0.3s',
+                      }}>{repCount}</span>
+                      <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                        target: <span style={{ color: 'var(--text)', fontWeight: 500 }}>{currentEx.target_reps}</span>
+                      </p>
+                    </div>
+
+                    <button onClick={() => adjustReps(1)} style={{
+                      width: 52, height: 52, borderRadius: '50%', border: '2px solid var(--border2)',
+                      background: 'var(--surface2)', color: 'var(--text)', fontSize: 24, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border2)'}
+                    >+</button>
+                  </div>
+
+                  <button className="btn btn-primary" onClick={completeSet}
+                    style={{ padding: '12px 40px', fontSize: 15, borderRadius: 12, width: '100%', justifyContent: 'center' }}>
+                    {repCount >= currentEx.target_reps ? '✓ ' : ''}Complete Set {setNum}
+                  </button>
                 </div>
+
+                {/* Upcoming */}
+                {routine.exercises.length > 1 && (
+                  <div>
+                    <p style={{ fontSize: 11, color: 'var(--muted2)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Coming up</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {routine.exercises.slice(exIdx + 1, exIdx + 4).map((ex, i) => (
+                        <div key={ex.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10 }}>
+                          <span style={{ fontSize: 11, color: 'var(--muted2)', width: 18, textAlign: 'center' }}>{exIdx + i + 2}</span>
+                          <span style={{ flex: 1, fontSize: 13, color: 'var(--muted)' }}>{ex.exercise_name}</span>
+                          <span className="badge badge-purple" style={{ fontSize: 10 }}>{ex.muscle_group}</span>
+                          <span style={{ fontSize: 11, color: 'var(--muted2)' }}>{ex.sets}×{ex.target_reps}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
-
-            {/* Rest timer overlay */}
-            {restTimer !== null && (
-              <div style={{
-                position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.85)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px',
-              }}>
-                <div style={{ fontSize: '13px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Rest Time</div>
-                <div style={{ fontSize: '72px', fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif', color: restTimer <= 5 ? 'var(--red)' : 'var(--accent)' }}>
-                  {restTimer}
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--muted)' }}>seconds remaining</div>
-                <button className="btn btn-ghost" style={{ marginTop: '8px' }} onClick={() => {
-                  clearInterval(restTimerRef.current); restTimerRef.current = null; setRestTimer(null)
-                  setCurrentSet(s => s + 1); setFeedback('Skipped rest — start your set!'); setFeedbackColor('var(--yellow)')
-                }}>Skip Rest</button>
-              </div>
-            )}
-          </div>
-
-          {/* Bottom bar */}
-          <div style={{ display: 'flex', gap: '12px', flexShrink: 0 }}>
-            {/* Exercise info */}
-            <div style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              {currentExercise ? (
-                <>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '2px' }}>{currentExercise.exercise_name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                      {currentExercise.sets} sets · {currentExercise.target_reps} reps · {currentExercise.rest_seconds}s rest
-                    </div>
-                  </div>
-                  {/* Rep counter */}
-                  <div style={{ textAlign: 'center', padding: '0 16px', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
-                    <div style={{ fontSize: '36px', fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif', color: 'var(--accent)', lineHeight: 1 }}>{reps}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>/ {currentExercise.target_reps} reps</div>
-                  </div>
-                  {/* Feedback */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: feedbackColor, flexShrink: 0 }}/>
-                    <span style={{ fontSize: '13px', color: feedbackColor }}>{feedback}</span>
-                  </div>
-                </>
-              ) : (
-                <span style={{ color: 'var(--muted)', fontSize: '14px' }}>Loading routine…</span>
-              )}
-            </div>
-
-            {/* Voice button */}
-            <button
-              onClick={startVoice}
-              title="Say an exercise name"
-              style={{
-                width: '56px', height: '56px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                background: listening ? 'var(--red)' : 'var(--surface2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'background 0.2s', flexShrink: 0,
-                boxShadow: listening ? '0 0 0 3px rgba(245,101,101,0.3)' : 'none',
-              }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={listening ? 'white' : 'var(--muted)'} strokeWidth="2">
-                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
-              </svg>
-            </button>
-
-            {/* Manual complete set */}
-            <button
-              className="btn btn-primary"
-              style={{ padding: '0 20px', height: '56px', flexShrink: 0, fontSize: '13px' }}
-              disabled={!cameraReady || restTimer !== null}
-              onClick={() => currentExercise && completeSet(currentExercise)}
-            >
-              Complete Set
-            </button>
           </div>
         </div>
 
-        {/* AI Chat */}
-        <AIChat contextRef={aiContextRef}/>
+        {/* Right — AI Chat */}
+        <div style={{ flex: '0 0 40%', borderLeft: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <AIChat context={buildContext()} />
+        </div>
       </div>
 
-      <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }`}</style>
+      <style>{`
+        @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-5px);opacity:1} }
+      `}</style>
     </div>
   )
 }

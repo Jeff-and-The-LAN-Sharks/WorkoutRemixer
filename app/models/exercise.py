@@ -8,3 +8,4 @@ class Exercise(SQLModel, table=True):
     muscle_group: str
     description: str = ""
     difficulty: str = "beginner"
+    video_id: str = ""

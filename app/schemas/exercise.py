@@ -7,6 +7,7 @@ class ExerciseCreate(SQLModel):
     muscle_group: str
     description: str = ""
     difficulty: str = "beginner"
+    video_id: str = ""
 
 
 class ExerciseResponse(SQLModel):
@@ -15,3 +16,4 @@ class ExerciseResponse(SQLModel):
     muscle_group: str
     description: str
     difficulty: str
+    video_id: str
