@@ -19,7 +19,6 @@ dependencies = [
     "jinja2",
     "pwdlib[argon2]",
     "psycopg2-binary",
-    "psycopg2-binary",
     "pyjwt",
     "python-jose",
     "pytest-asyncio",
