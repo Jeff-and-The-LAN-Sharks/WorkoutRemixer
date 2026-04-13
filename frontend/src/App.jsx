@@ -10,6 +10,7 @@ import Workout from './pages/Workout'
 import History from './pages/History'
 import Food from './pages/Food'
 import Profile from './pages/Profile'
+import AIChat from './pages/AIChat'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/history"       element={<ProtectedRoute><Layout><History /></Layout></ProtectedRoute>} />
           <Route path="/food"          element={<ProtectedRoute><Layout><Food /></Layout></ProtectedRoute>} />
           <Route path="/profile"       element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
+          <Route path="/coach"         element={<ProtectedRoute><Layout><AIChat /></Layout></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

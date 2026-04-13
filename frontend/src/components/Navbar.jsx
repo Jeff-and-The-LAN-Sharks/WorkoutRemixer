@@ -6,6 +6,7 @@ const LINKS = [
   { to: '/routines',  label: 'Routines' },
   { to: '/exercises', label: 'Exercises' },
   { to: '/food',      label: 'Nutrition' },
+  { to: '/coach',     label: '✦ AI Coach' },
   { to: '/history',   label: 'History' },
 ]
 
@@ -35,7 +36,9 @@ export default function Navbar() {
           <Link key={l.to} to={l.to} style={{
             padding: '6px 12px', borderRadius: 8, fontSize: 13, fontWeight: 500,
             textDecoration: 'none', transition: 'all 0.15s',
-            color: isActive(l.to) ? 'var(--text)' : 'var(--muted)',
+            color: isActive(l.to)
+              ? l.to === '/coach' ? 'var(--green)' : 'var(--text)'
+              : l.to === '/coach' ? 'var(--green)' : 'var(--muted)',
             background: isActive(l.to) ? 'var(--surface2)' : 'transparent',
           }}>{l.label}</Link>
         ))}

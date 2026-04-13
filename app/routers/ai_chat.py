@@ -1,22 +1,20 @@
 from fastapi import HTTPException
 from app.dependencies import AuthDep
 from app.schemas.chat import ChatRequest
+from app.config import get_settings
 from . import api_router
 import httpx
 
-AI_BASE_URL = "https://ai-gen.sundaebytestt.com/v1/chat/completions"
-AI_API_KEY = "sk-59addf63a8bd464c92242421db666aa1"
-AI_MODEL = "meta/llama-3.2-3b-instruct"
-
 SYSTEM_PROMPT = """You are an AI fitness coach built into the Workout Remixer app.
-You help users with exercise form, rep counting, technique tips, motivation, and workout advice.
-You have access to the user's current exercise and joint angle data when provided.
+You help users with exercise form, technique tips, workout advice, nutrition guidance and motivation.
 Keep responses concise (under 120 words) unless detailed technique is requested.
 Be encouraging, specific, and always prioritise safety."""
 
 
 @api_router.post("/chat")
 async def chat(request: ChatRequest, user: AuthDep):
+    api_key = get_settings().groq_api_key
+
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
     if request.exercise_context:
@@ -30,12 +28,17 @@ async def chat(request: ChatRequest, user: AuthDep):
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             response = await client.post(
-                AI_BASE_URL,
+                "https://api.groq.com/openai/v1/chat/completions",
                 headers={
-                    "Authorization": f"Bearer {AI_API_KEY}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 },
-                json={"model": AI_MODEL, "messages": messages},
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": messages,
+                    "max_tokens": 300,
+                    "temperature": 0.7,
+                },
             )
             response.raise_for_status()
             data = response.json()
