@@ -9,3 +9,5 @@ class DailyLog(SQLModel, table=True):
     log_date: date = Field(default_factory=date.today)
     calories: int = 0
     water_ml: int = 0
+
+#added!

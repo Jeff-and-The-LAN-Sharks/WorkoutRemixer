@@ -5,7 +5,7 @@ from app.models.exercise import Exercise
 from sqlmodel import select
 
 EXERCISES = [
-    # Arms
+    # This will be the execies we put for the arms
     {"name": "Bicep Curl", "muscle_group": "Arms", "difficulty": "beginner",
      "video_id": "ykJmrZ5v0Oo",
      "description": "Stand with dumbbells at your sides, palms facing forward. Curl the weights up to your shoulders keeping elbows pinned to your sides. Squeeze at the top then lower slowly."},
@@ -25,7 +25,7 @@ EXERCISES = [
      "video_id": "d_KZxkY_0cM",
      "description": "Lie on a bench holding a barbell or dumbbells above your chest. Bend only at the elbows to lower the weight toward your forehead then extend back up. Keep upper arms still."},
 
-    # Chest
+    # this will be for the chest
     {"name": "Push Up", "muscle_group": "Chest", "difficulty": "beginner",
      "video_id": "IODxDxX7oi4",
      "description": "Start in a high plank with hands shoulder-width apart. Lower your chest to the ground keeping your body in a straight line, elbows at 45 degrees. Push explosively back up."},
@@ -42,7 +42,7 @@ EXERCISES = [
      "video_id": "taI4XduLpTk",
      "description": "Stand between two high cable pulleys. Pull the handles down and across your body in a hugging motion, squeezing your chest at the bottom. Great for inner chest definition."},
 
-    # Back
+    # the back
     {"name": "Deadlift", "muscle_group": "Back", "difficulty": "intermediate",
      "video_id": "op9kVnSso6Q",
      "description": "Stand with feet hip-width, bar over mid-foot. Hinge at hips, grip the bar, keep back flat. Drive through your heels pushing the floor away, extending hips and knees simultaneously."},
@@ -62,7 +62,7 @@ EXERCISES = [
      "video_id": "GZbfZ033f74",
      "description": "Sit upright at a low cable machine. Pull the handle to your lower abdomen squeezing your elbows back. Avoid rounding your spine. Feel the full stretch at the start."},
 
-    # Shoulders
+    # the shoulders
     {"name": "Shoulder Press", "muscle_group": "Shoulders", "difficulty": "intermediate",
      "video_id": "qEwKCR5JCog",
      "description": "Hold dumbbells at shoulder height, elbows at 90 degrees. Press directly overhead until arms are fully extended. Lower back to start with control. Keep core braced."},
@@ -79,7 +79,7 @@ EXERCISES = [
      "video_id": "rep-qVOkqgk",
      "description": "Set a cable rope at face height. Pull the rope toward your face with elbows flared high. Great for rear delt development and shoulder health."},
 
-    # Legs
+    # the legs
     {"name": "Squat", "muscle_group": "Legs", "difficulty": "beginner",
      "video_id": "aclHkVaku9U",
      "description": "Stand feet shoulder-width apart, toes slightly out. Sit back and down keeping chest up and knees tracking over toes. Reach parallel or below, then drive through your heels to stand."},
@@ -102,7 +102,7 @@ EXERCISES = [
      "video_id": "2C-uNgKwPLE",
      "description": "Place your rear foot on a bench, front foot forward. Lower your rear knee toward the floor keeping your torso upright. Drive through the front heel to stand."},
 
-    # Core
+    # the core
     {"name": "Plank", "muscle_group": "Core", "difficulty": "beginner",
      "video_id": "ASdvN_XEl_c",
      "description": "Hold a forearm plank with your body in a straight line from head to heels. Squeeze your glutes and abs, breathe normally. Don't let your hips sag or rise."},
@@ -122,7 +122,7 @@ EXERCISES = [
      "video_id": "p3UjGClWlFU",
      "description": "Kneel with an ab wheel in front of you. Roll forward slowly extending your body toward the floor as far as you can, then contract your abs to pull back to the start."},
 
-    # Full Body
+    # for the ful body
     {"name": "Burpee", "muscle_group": "Full Body", "difficulty": "intermediate",
      "video_id": "dZgVxmf6jkA",
      "description": "From standing, drop your hands to the floor, jump your feet back to a plank, do a push up, jump feet to hands, then explosively jump up with arms overhead."},
@@ -140,7 +140,7 @@ EXERCISES = [
 
 def seed():
     with get_cli_session() as db:
-        # Seed bob
+        # this is to seed bob so when logging in we can use him as a user
         repo = UserRepository(db)
         auth = AuthService(repo)
         if not repo.get_by_username("bob"):
@@ -149,7 +149,7 @@ def seed():
         else:
             print("ℹ️  bob already exists")
 
-        # Seed exercises
+        # this is to seed the exercises for the website so they can show up
         existing = db.exec(select(Exercise)).first()
         if not existing:
             for ex_data in EXERCISES:
@@ -159,3 +159,8 @@ def seed():
             print(f"✅ {len(EXERCISES)} exercises seeded")
         else:
             print("ℹ️  Exercises already seeded")
+
+
+#we need on for full body too can someone add it after Aaron commits?
+
+#done

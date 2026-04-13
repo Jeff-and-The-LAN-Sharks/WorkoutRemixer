@@ -9,3 +9,5 @@ class Exercise(SQLModel, table=True):
     description: str = ""
     difficulty: str = "beginner"
     video_id: str = ""
+
+#models are good we should add a one for healthlog tho

@@ -23,7 +23,7 @@ async def chat(request: ChatRequest, user: AuthDep):
             temperature=0.7,
         )
 
-        # Build message history for LangChain
+        # bascially feeding LangChain the logs
         messages = [SystemMessage(content=SYSTEM_PROMPT)]
 
         if request.exercise_context:
@@ -35,9 +35,13 @@ async def chat(request: ChatRequest, user: AuthDep):
             else:
                 messages.append(AIMessage(content=m.content))
 
-        # Invoke LangChain
+        
         response = llm.invoke(messages)
         return {"reply": response.content}
 
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI service error: {str(e)}")
+    
+    #we just added this one do a render test to make sure its working it took a quite a while
+
+    #the rest of them should be good so dont worry too much about them

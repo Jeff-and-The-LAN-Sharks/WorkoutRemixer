@@ -23,3 +23,5 @@ class SignupRequest(SQLModel):
     username: str
     email: EmailStr
     password: str
+
+#marker i thing this should be it for the user and most of them 

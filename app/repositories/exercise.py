@@ -41,3 +41,5 @@ class ExerciseRepository:
         return self.db.exec(
             select(Exercise).where(Exercise.name == name)
         ).first() is not None
+
+#the repos are complete

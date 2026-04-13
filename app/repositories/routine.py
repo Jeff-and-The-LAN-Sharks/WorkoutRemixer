@@ -43,7 +43,7 @@ class RoutineRepository:
 
     def delete(self, routine_id: int):
         try:
-            # Delete routine exercises first
+            # put this to delete routine exercises first
             res = self.db.exec(
                 select(RoutineExercise).where(RoutineExercise.routine_id == routine_id)
             ).all()

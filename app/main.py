@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.routers import templates, static_files, router, api_router
 from app.config import get_settings
 from contextlib import asynccontextmanager
-import app.models  # noqa: F401 — registers all SQLModel tables
+import app.models 
 
 
 @asynccontextmanager
@@ -37,7 +37,7 @@ app.add_middleware(
 app.include_router(api_router)
 app.mount("/static", static_files, name="static")
 
-# ── Serve built React app (only if built) ────────────────────────────────────
+# send the react app to the brwser
 FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
 
 app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="react-assets")
