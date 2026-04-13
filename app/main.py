@@ -45,8 +45,7 @@ app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")
 @app.get("/{full_path:path}", include_in_schema=False)
 async def serve_react(full_path: str):
     index = os.path.join(FRONTEND_DIST, "index.html")
-    if os.path.exists(index):
-        return FileResponse(index)
+    return FileResponse(index)
     return {"message": "Frontend not built. Run: cd frontend && npm run build"}
 
 app.include_router(router)
