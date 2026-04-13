@@ -228,6 +228,9 @@ def seed():
             if not existing:
                 exercise = Exercise(**ex_data)
                 db.add(exercise)
+            else:
+                existing.video_id = ex_data["video_id"]
+                db.add(existing)
         db.commit()
         print("✅ Exercises seeded")
 
