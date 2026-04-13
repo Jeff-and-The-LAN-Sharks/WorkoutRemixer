@@ -34,19 +34,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+
 app.include_router(api_router)
 app.mount("/static", static_files, name="static")
 
 # ── Serve built React app ─────────────────────────────────────────────────────
 FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
-
 app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="react-assets")
 
 @app.get("/{full_path:path}", include_in_schema=False)
 async def serve_react(full_path: str):
     index = os.path.join(FRONTEND_DIST, "index.html")
     return FileResponse(index)
+
+app.include_router(router) 
 
 @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
 async def unauthorized_redirect_handler(request: Request, exc: Exception):
