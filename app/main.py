@@ -43,16 +43,14 @@ FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"
 
 app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="react-assets")
 
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_react(full_path: str):
-        index = os.path.join(FRONTEND_DIST, "index.html")
-        return FileResponse(index)
-
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_react(full_path: str):
+    index = os.path.join(FRONTEND_DIST, "index.html")
+    return FileResponse(index)
 
 @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
 async def unauthorized_redirect_handler(request: Request, exc: Exception):
     return templates.TemplateResponse(request=request, name="401.html")
-
 
 if __name__ == "__main__":
     uvicorn.run(
