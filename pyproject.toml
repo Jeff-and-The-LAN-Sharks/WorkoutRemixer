@@ -28,6 +28,8 @@ dependencies = [
     "tabulate",
     "typer",
     "uvicorn[standard]",
+    "langchain",
+    "langchain-groq",
 ]
 [project.optional-dependencies]
 dev = [
