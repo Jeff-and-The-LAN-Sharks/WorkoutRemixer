@@ -5,7 +5,7 @@ from app.config import get_settings
 from . import api_router
 
 from langchain_groq import ChatGroq
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 SYSTEM_PROMPT = """You are an AI fitness coach built into the Workout Remixer app.
 You help users with exercise form, technique tips, workout advice, nutrition guidance and motivation.
@@ -23,7 +23,7 @@ async def chat(request: ChatRequest, user: AuthDep):
             temperature=0.7,
         )
 
-        
+        # Build message history for LangChain
         messages = [SystemMessage(content=SYSTEM_PROMPT)]
 
         if request.exercise_context:
@@ -35,7 +35,7 @@ async def chat(request: ChatRequest, user: AuthDep):
             else:
                 messages.append(AIMessage(content=m.content))
 
-        
+        # Invoke LangChain
         response = llm.invoke(messages)
         return {"reply": response.content}
 
