@@ -66,14 +66,14 @@ export default function RoutineDetail() {
 
   return (
     <div className="page">
-      {/* Breadcrumb */}
+      {}
       <div style={{ marginBottom: '20px' }}>
         <Link to="/routines" style={{ color: 'var(--muted)', fontSize: '13px', textDecoration: 'none' }}>
           ← Routines
         </Link>
       </div>
 
-      {/* Header */}
+      {}
       {editing ? (
         <form onSubmit={saveEdit} style={{ marginBottom: '28px' }}>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -112,7 +112,7 @@ export default function RoutineDetail() {
         </div>
       )}
 
-      {/* Exercises list */}
+      {}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h2 style={{ fontSize: '16px', fontWeight: 600 }}>
           Exercises <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '14px' }}>({routine.exercises.length})</span>
@@ -168,7 +168,7 @@ export default function RoutineDetail() {
         </div>
       )}
 
-      {/* Add exercise modal */}
+      {}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>

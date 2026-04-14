@@ -30,7 +30,7 @@ export default function Login() {
       background: 'var(--bg)', padding: 20,
     }}>
       <div style={{ width: '100%', maxWidth: 380 }}>
-        {/* Logo */}
+        {}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
             width: 52, height: 52, background: 'var(--accent)',

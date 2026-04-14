@@ -59,7 +59,7 @@ export default function AIChat() {
   return (
     <div className="page" style={{ maxWidth: 800, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 56px)', padding: '24px 24px 0' }}>
 
-      {/* Header */}
+      {}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexShrink: 0 }}>
         <div>
           <h1 className="page-title" style={{ marginBottom: 4 }}>AI Coach</h1>
@@ -73,7 +73,7 @@ export default function AIChat() {
         </button>
       </div>
 
-      {/* Messages */}
+      {}
       <div style={{
         flex: 1, overflowY: 'auto', scrollbarWidth: 'thin',
         scrollbarColor: 'var(--surface3) transparent',
@@ -83,7 +83,7 @@ export default function AIChat() {
           {messages.map((m, i) => (
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexDirection: m.role === 'user' ? 'row-reverse' : 'row' }}>
 
-              {/* Avatar */}
+              {}
               <div style={{
                 width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                 background: m.role === 'user'
@@ -95,7 +95,7 @@ export default function AIChat() {
                 {m.role === 'user' ? 'U' : 'AI'}
               </div>
 
-              {/* Bubble */}
+              {}
               <div style={{
                 maxWidth: '75%',
                 padding: '12px 16px',
@@ -111,7 +111,7 @@ export default function AIChat() {
             </div>
           ))}
 
-          {/* Typing indicator */}
+          {}
           {loading && (
             <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
               <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, var(--green), #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'white', flexShrink: 0 }}>AI</div>
@@ -127,7 +127,7 @@ export default function AIChat() {
         </div>
       </div>
 
-      {/* Suggestions — only show when chat is fresh */}
+      {}
       {messages.length === 1 && (
         <div style={{ marginBottom: 16, flexShrink: 0 }}>
           <p style={{ fontSize: 12, color: 'var(--muted2)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Suggested questions</p>
@@ -147,7 +147,7 @@ export default function AIChat() {
         </div>
       )}
 
-      {/* Input */}
+      {}
       <div style={{
         display: 'flex', gap: 10, alignItems: 'flex-end',
         padding: '16px 0 24px', flexShrink: 0,

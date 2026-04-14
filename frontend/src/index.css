@@ -24,12 +24,12 @@ body {
   min-height: 100vh;
 }
 
-/* Scrollbar */
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 
-/* Shared components */
+
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 9px 18px; border-radius: 10px; font-size: 13px;
@@ -91,7 +91,7 @@ body {
 select.input { cursor: pointer; }
 textarea.input { resize: vertical; min-height: 80px; }
 
-/* Modal */
+
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center; z-index: 100;
@@ -106,7 +106,7 @@ textarea.input { resize: vertical; min-height: 80px; }
 .form-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
 .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
-/* Difficulty dots */
+
 .diff-beginner { color: var(--green); }
 .diff-intermediate { color: var(--yellow); }
 .diff-advanced { color: var(--red); }

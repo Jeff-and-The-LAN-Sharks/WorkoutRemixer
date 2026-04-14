@@ -51,13 +51,13 @@ export default function History() {
       <h1 className="page-title">Workout History</h1>
       <p className="page-sub">Track your progress over time.</p>
 
-      {/* Stats row */}
+      {}
       {completed.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '28px' }}>
           {[
             { label: 'Workouts completed', value: completed.length },
             { label: 'Total reps logged', value: totalReps },
-            { label: 'Avg form score', value: `${avgForm}%` },
+            
           ].map(({ label, value }) => (
             <div key={label} style={{
               background: 'var(--surface)', border: '1px solid var(--border)',
@@ -95,7 +95,7 @@ export default function History() {
                   style={{ display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
                   onClick={() => setExpanded(isOpen ? null : session.id)}
                 >
-                  {session.sets.length > 0 && <FormScore score={avgScore} />}
+                  
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
                       <span style={{ fontSize: '15px', fontWeight: 600 }}>

@@ -106,7 +106,7 @@ export default function Profile() {
     } finally { setSaving(false) }
   }
 
-  // ── Calculations ──
+  
   const bmi = calcBMI(form.weight_kg, form.height_cm)
   const bmiData = bmiInfo(bmi)
   const maintenance = calcTDEE(form.weight_kg, form.height_cm, form.age, form.gender, form.activity_level)
@@ -127,7 +127,7 @@ export default function Profile() {
   return (
     <div className="page">
 
-      {/* ── Profile Header ── */}
+      {}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 36 }}>
         <div style={{
           width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
@@ -152,7 +152,7 @@ export default function Profile() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 24, marginBottom: 32, alignItems: 'start' }}>
 
-        {/* ── Profile Form ── */}
+        {}
         <div className="card">
           <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Personal Info</h2>
           <form onSubmit={handleSave}>
@@ -212,7 +212,7 @@ export default function Profile() {
           </form>
         </div>
 
-        {/* ── Metrics Panel ── */}
+        {}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {(!form.height_cm || !form.weight_kg || !form.age) && (
@@ -221,7 +221,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* BMI */}
+          {}
           {bmi && (
             <div className="card">
               <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Body Mass Index (BMI)</h2>
@@ -255,7 +255,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Calorie targets */}
+          {}
           {maintenance && (
             <div className="card">
               <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>Daily Calorie Targets</h2>
@@ -289,7 +289,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Workout stats */}
+          {}
           {sessions.length > 0 && (
             <div className="card">
               <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Workout Summary</h2>
@@ -310,7 +310,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ── History Tabs ── */}
+      {}
       <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
         {[
           { key: 'workouts', label: '🏋️ Workout History' },
@@ -326,7 +326,7 @@ export default function Profile() {
         ))}
       </div>
 
-      {/* ── Workout History ── */}
+      {}
       {historyTab === 'workouts' && (
         sessions.length === 0 ? (
           <div className="empty-state">
@@ -343,7 +343,7 @@ export default function Profile() {
               return (
                 <div key={s.id} className="card" style={{ padding: '16px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    {/* Form score ring */}
+                    {}
                     <div style={{
                       width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
                       border: `2px solid ${avgForm >= 80 ? 'var(--green)' : avgForm >= 60 ? 'var(--yellow)' : 'var(--red)'}`,
@@ -386,7 +386,7 @@ export default function Profile() {
         )
       )}
 
-      {/* ── Nutrition History ── */}
+      {}
       {historyTab === 'nutrition' && (
         healthHistory.length === 0 ? (
           <div className="empty-state">
@@ -410,7 +410,7 @@ export default function Profile() {
                       </p>
                     </div>
 
-                    {/* Calorie bar */}
+                    {}
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                         <span style={{ fontSize: 12, color: 'var(--muted)' }}>🔥 Calories</span>
@@ -423,7 +423,7 @@ export default function Profile() {
                       </div>
                     </div>
 
-                    {/* Water bar */}
+                    {}
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                         <span style={{ fontSize: 12, color: 'var(--muted)' }}>💧 Water</span>

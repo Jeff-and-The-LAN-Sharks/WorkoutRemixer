@@ -4,7 +4,7 @@ import api from '../api/client'
 
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-// ── AI Chat ──────────────────────────────────────────────────────────────────
+
 function AIChat({ context }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: "Hey! I'm your AI coach. Ask me about form, technique, nutrition — anything to help your workout!" }
@@ -108,7 +108,7 @@ function AIChat({ context }) {
   )
 }
 
-// ── Main Workout Page ─────────────────────────────────────────────────────────
+
 export default function Workout() {
   const { routineId } = useParams()
   const navigate = useNavigate()
@@ -117,14 +117,14 @@ export default function Workout() {
   const [sessionId, setSessionId] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Progress
+  
   const [exIdx, setExIdx] = useState(0)
   const [setNum, setSetNum] = useState(1)
   const [repCount, setRepCount] = useState(0)
   const [done, setDone] = useState(false)
   const [completedSets, setCompletedSets] = useState([])
 
-  // Timers
+  
   const [elapsed, setElapsed] = useState(0)
   const [isResting, setIsResting] = useState(false)
   const [restLeft, setRestLeft] = useState(0)
@@ -146,7 +146,7 @@ export default function Workout() {
       .catch(() => navigate('/routines'))
   }, [routineId])
 
-  // Elapsed timer
+  
   useEffect(() => {
     elapsedRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
     return () => clearInterval(elapsedRef.current)
@@ -183,7 +183,7 @@ export default function Workout() {
 
     if (isLastSet && isLastEx) { finishWorkout(); return }
 
-    // Start rest
+    
     const rest = currentEx.rest_seconds || 60
     setRestTotal(rest)
     setRestLeft(rest)
@@ -232,13 +232,13 @@ export default function Workout() {
     </div>
   )
 
-  // ── Done screen ──
+  
   if (done) {
     const totalReps = completedSets.reduce((a, s) => a + s.reps, 0)
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 0, padding: 24 }}>
         <div style={{ maxWidth: 480, width: '100%', textAlign: 'center' }}>
-          {/* Trophy */}
+          {}
           <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(34,211,160,0.12)', border: '2px solid var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2">
               <polyline points="20 6 9 17 4 12"/>
@@ -249,7 +249,7 @@ export default function Workout() {
             Great work finishing <strong style={{ color: 'var(--text)' }}>{routine?.name}</strong>
           </p>
 
-          {/* Stats */}
+          {}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 32 }}>
             {[
               { label: 'Duration', value: fmtTime(elapsed) },
@@ -263,7 +263,7 @@ export default function Workout() {
             ))}
           </div>
 
-          {/* Completed sets list */}
+          {}
           {completedSets.length > 0 && (
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 16, marginBottom: 28, textAlign: 'left' }}>
               <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}>Sets Completed</p>
@@ -288,14 +288,14 @@ export default function Workout() {
     )
   }
 
-  // ── Rest screen ──
+  
   if (isResting) {
     const progress = ((restTotal - restLeft) / restTotal) * 100
     return (
       <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 24 }}>
         <p style={{ fontSize: 12, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 2 }}>Rest Time</p>
 
-        {/* Circular timer */}
+        {}
         <div style={{ position: 'relative', width: 180, height: 180 }}>
           <svg width="180" height="180" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
             <circle cx="90" cy="90" r="80" fill="none" stroke="var(--surface2)" strokeWidth="8"/>
@@ -333,13 +333,13 @@ export default function Workout() {
     )
   }
 
-  // ── Active workout ──
+  
   const progress = ((exIdx * (currentEx?.sets || 1) + (setNum - 1)) / (routine.exercises.reduce((a, e) => a + e.sets, 0))) * 100
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)', overflow: 'hidden' }}>
 
-      {/* Header */}
+      {}
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 52, borderBottom: '1px solid var(--border)', background: 'var(--surface)', flexShrink: 0 }}>
         <Link to={`/routines/${routineId}`} style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)', fontSize: 13, textDecoration: 'none' }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -347,7 +347,7 @@ export default function Workout() {
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, fontWeight: 600 }}>{routine?.name}</span>
-          {/* Elapsed timer */}
+          {}
           <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 10px', fontSize: 13, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif", color: 'var(--accent)' }}>
             ⏱ {fmtTime(elapsed)}
           </div>
@@ -355,18 +355,18 @@ export default function Workout() {
         <button className="btn btn-danger" style={{ padding: '5px 12px', fontSize: 12 }} onClick={finishWorkout}>Finish</button>
       </header>
 
-      {/* Progress bar */}
+      {}
       <div style={{ height: 3, background: 'var(--surface2)', flexShrink: 0 }}>
         <div style={{ height: '100%', background: 'var(--accent)', width: `${progress}%`, transition: 'width 0.5s ease' }}/>
       </div>
 
-      {/* Main */}
+      {}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
-        {/* Left — exercise */}
+        {}
         <div style={{ flex: '0 0 60%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-          {/* Video */}
+          {}
           {currentEx?.video_id && (
             <div style={{ position: 'relative', paddingBottom: '42%', background: '#000', flexShrink: 0 }}>
               <iframe
@@ -379,11 +379,11 @@ export default function Workout() {
             </div>
           )}
 
-          {/* Exercise info + rep counter */}
+          {}
           <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
             {currentEx && (
               <>
-                {/* Exercise header */}
+                {}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -404,7 +404,7 @@ export default function Workout() {
                   </div>
                 </div>
 
-                {/* Rep counter */}
+                {}
                 <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '24px', marginBottom: 20, textAlign: 'center' }}>
                   <p style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>
                     Reps Completed
@@ -446,7 +446,7 @@ export default function Workout() {
                   </button>
                 </div>
 
-                {/* Upcoming */}
+                {}
                 {routine.exercises.length > 1 && (
                   <div>
                     <p style={{ fontSize: 11, color: 'var(--muted2)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>Coming up</p>
@@ -467,7 +467,7 @@ export default function Workout() {
           </div>
         </div>
 
-        {/* Right — AI Chat */}
+        {}
         <div style={{ flex: '0 0 40%', borderLeft: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <AIChat context={buildContext()} />
         </div>

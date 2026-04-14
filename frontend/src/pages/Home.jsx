@@ -61,7 +61,7 @@ export default function Home() {
 
   return (
     <div className="page">
-      {/* Welcome */}
+      {}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 28, fontWeight: 700, marginBottom: 4 }}>
           {timeOfDay()}, {user?.username} 👋
@@ -69,7 +69,7 @@ export default function Home() {
         <p style={{ color: 'var(--muted)', fontSize: 15 }}>Here's your fitness overview for today.</p>
       </div>
 
-      {/* Stats row */}
+      {}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 32 }}>
         {[
           { label: 'Workouts', value: stats.sessions },
@@ -85,12 +85,12 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Today's health */}
+      {}
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '20px 24px', marginBottom: 32 }}>
         <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 18 }}>Today's Health</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
 
-          {/* Water */}
+          {}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ fontSize: 13, color: 'var(--muted)' }}>💧 Water</span>
@@ -110,7 +110,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Calories */}
+          {}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ fontSize: 13, color: 'var(--muted)' }}>🔥 Calories</span>
@@ -128,7 +128,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Nav cards */}
+      {}
       <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Quick Access</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginBottom: 32 }}>
         {NAV_CARDS.map(card => (
@@ -147,7 +147,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Recent workouts */}
+      {}
       {recentSessions.length > 0 && (
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>

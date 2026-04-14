@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../api/client'
 
-// ── Meal data — no video IDs needed, recipe opens YouTube search ─────────────
 const MEALS = {
   healthy: [
     { name: 'Grilled Salmon & Veggies', emoji: '🐟', cal: 420, protein: 42, carbs: 18, fat: 22,
@@ -107,7 +106,7 @@ function MealCard({ meal, onAdd }) {
       onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.transform = '' }}
     >
-      {/* Hero */}
+      {}
       <div style={{
         margin: '-20px -20px 0', padding: '24px 20px 20px',
         background: 'linear-gradient(135deg, var(--surface2), var(--surface3))',
@@ -123,7 +122,7 @@ function MealCard({ meal, onAdd }) {
         </div>
       </div>
 
-      {/* Macros */}
+      {}
       <div style={{ display: 'flex', gap: 6 }}>
         {[['Protein', meal.protein], ['Carbs', meal.carbs], ['Fat', meal.fat]].map(([label, val]) => (
           <div key={label} style={{ flex: 1, textAlign: 'center', background: 'var(--surface2)', borderRadius: 8, padding: '6px 4px' }}>
@@ -133,10 +132,10 @@ function MealCard({ meal, onAdd }) {
         ))}
       </div>
 
-      {/* Description */}
+      {}
       <p style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.6, flex: 1 }}>{meal.desc}</p>
 
-      {/* Actions */}
+      {}
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="btn btn-ghost" onClick={openRecipe}
           style={{ flex: 1, justifyContent: 'center', fontSize: 12, padding: '7px' }}>
@@ -197,10 +196,10 @@ export default function Food() {
       <h1 className="page-title">Nutrition</h1>
       <p className="page-sub">Healthy meal ideas with recipes, calorie tracking and daily water intake.</p>
 
-      {/* ── Daily Trackers ── */}
+      {}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 32 }}>
 
-        {/* Calories */}
+        {}
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -211,7 +210,7 @@ export default function Food() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 16 }}>
-            {/* Ring */}
+            {}
             <div style={{ position: 'relative', width: 88, height: 88, flexShrink: 0 }}>
               <svg width="88" height="88" style={{ transform: 'rotate(-90deg)' }}>
                 <circle cx="44" cy="44" r="36" fill="none" stroke="var(--surface2)" strokeWidth="8"/>
@@ -246,7 +245,7 @@ export default function Food() {
           </form>
         </div>
 
-        {/* Water */}
+        {}
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -296,7 +295,7 @@ export default function Food() {
         </div>
       </div>
 
-      {/* ── Tabs ── */}
+      {}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
         {Object.entries(TAB_CONFIG).map(([key, cfg]) => (
           <button key={key} onClick={() => setTab(key)} style={{
@@ -309,7 +308,7 @@ export default function Food() {
         ))}
       </div>
 
-      {/* Diet info banner */}
+      {}
       {TAB_CONFIG[tab].desc && (
         <div style={{ background: TAB_CONFIG[tab].bg, border: `1px solid ${TAB_CONFIG[tab].color}33`, borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
           <strong style={{ color: TAB_CONFIG[tab].color }}>{tab.charAt(0).toUpperCase() + tab.slice(1)} Diet — </strong>

@@ -102,7 +102,7 @@ export default function Exercises() {
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.transform = '' }}
             >
-              {/* Thumbnail */}
+              {}
               {ex.video_id && (
                 <div style={{ position: 'relative', paddingBottom: '52%', background: '#000' }}>
                   <img src={`https://img.youtube.com/vi/${ex.video_id}/mqdefault.jpg`} alt={ex.name}
