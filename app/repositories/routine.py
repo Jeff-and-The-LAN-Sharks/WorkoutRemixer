@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from app.models.routine import Routine, RoutineExercise
 from app.models.exercise import Exercise
+from app.models.session import WorkoutSession, CompletedSet
 from typing import Optional
 import logging
 
@@ -43,15 +44,30 @@ class RoutineRepository:
 
     def delete(self, routine_id: int):
         try:
-            # put this to delete routine exercises first
-            res = self.db.exec(
+            # 1. Delete completed sets linked to sessions of this routine
+            sessions = self.db.exec(
+                select(WorkoutSession).where(WorkoutSession.routine_id == routine_id)
+            ).all()
+            for session in sessions:
+                sets = self.db.exec(
+                    select(CompletedSet).where(CompletedSet.session_id == session.id)
+                ).all()
+                for s in sets:
+                    self.db.delete(s)
+                self.db.delete(session)
+
+            # 2. Delete routine exercises
+            routine_exercises = self.db.exec(
                 select(RoutineExercise).where(RoutineExercise.routine_id == routine_id)
             ).all()
-            for re in res:
+            for re in routine_exercises:
                 self.db.delete(re)
+
+            # 3. Delete the routine itself
             routine = self.db.get(Routine, routine_id)
             if routine:
                 self.db.delete(routine)
+
             self.db.commit()
         except Exception as e:
             logger.error(f"Error deleting routine: {e}")
