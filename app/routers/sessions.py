@@ -36,3 +36,12 @@ async def log_set(session_id: int, data: CompletedSetCreate, db: SessionDep, use
         return _get_service(db).add_set(session_id, data, user.id)
     except PermissionError:
         raise HTTPException(status_code=403, detail="Not authorized")
+    
+@api_router.delete("/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_session(session_id: int, db: SessionDep, user: AuthDep):
+    try:
+        _get_service(db).delete(session_id, user.id)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Session not found")
+    except PermissionError:
+        raise HTTPException(status_code=403, detail="Not authorized")
