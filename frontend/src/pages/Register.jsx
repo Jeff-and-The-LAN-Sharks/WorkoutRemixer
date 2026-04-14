@@ -1,25 +1,36 @@
 import { useState } from 'react'
-import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { Link, useNavigate } from 'react-router-dom'
+import api from '../api/client'
 
-export default function Login() {
-  const { login } = useAuth()
+export default function Register() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const [form, setForm] = useState({ username: '', password: '' })
+  const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const registered = location.state?.registered
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (form.password !== form.confirm) {
+      setError('Passwords do not match')
+      return
+    }
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+
     setLoading(true)
     try {
-      await login(form.username, form.password)
-      navigate('/home')
-    } catch {
-      setError('Invalid username or password')
+      await api.post('/auth/register', {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      })
+      navigate('/login', { state: { registered: true } })
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Username or email already exists')
     } finally {
       setLoading(false)
     }
@@ -31,7 +42,7 @@ export default function Login() {
       alignItems: 'center', justifyContent: 'center',
       background: 'var(--bg)', padding: 20,
     }}>
-      <div style={{ width: '100%', maxWidth: 380 }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
@@ -47,15 +58,9 @@ export default function Login() {
             Workout Remixer
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 6 }}>
-            Sign in to your account
+            Create your account
           </p>
         </div>
-
-        {registered && (
-          <div style={{ background: 'rgba(34,211,160,0.1)', border: '1px solid rgba(34,211,160,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: 'var(--green)', textAlign: 'center' }}>
-            Account created! Sign in below.
-          </div>
-        )}
 
         <div className="card" style={{ padding: 28 }}>
           <form onSubmit={handleSubmit}>
@@ -64,10 +69,22 @@ export default function Login() {
               <input
                 className="input"
                 type="text"
-                placeholder="Enter username"
+                placeholder="Choose a username"
                 value={form.username}
                 onChange={e => setForm(p => ({ ...p, username: e.target.value }))}
                 autoFocus
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                className="input"
+                type="email"
+                placeholder="Enter your email"
+                value={form.email}
+                onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                required
               />
             </div>
             <div className="form-group">
@@ -75,25 +92,39 @@ export default function Login() {
               <input
                 className="input"
                 type="password"
-                placeholder="Enter password"
+                placeholder="At least 6 characters"
                 value={form.password}
                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                required
               />
             </div>
+            <div className="form-group">
+              <label className="form-label">Confirm Password</label>
+              <input
+                className="input"
+                type="password"
+                placeholder="Repeat your password"
+                value={form.confirm}
+                onChange={e => setForm(p => ({ ...p, confirm: e.target.value }))}
+                required
+              />
+            </div>
+
             {error && (
               <p style={{ color: 'var(--red)', fontSize: 13, marginBottom: 14 }}>{error}</p>
             )}
+
             <button className="btn btn-primary" type="submit" disabled={loading}
               style={{ width: '100%', justifyContent: 'center', padding: '11px', marginTop: 4 }}>
-              {loading ? 'Signing in…' : 'Sign In'}
+              {loading ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'var(--muted)' }}>
-          Don't have an account?{' '}
-          <Link to="/register" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
-            Sign up
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>
+            Sign in
           </Link>
         </p>
       </div>

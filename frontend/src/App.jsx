@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Home from './pages/Home'
 import Exercises from './pages/Exercises'
 import Routines from './pages/Routines'
@@ -27,8 +28,9 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/login"    element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/"         element={<Navigate to="/home" replace />} />
           <Route path="/home"          element={<ProtectedRoute><Layout><Home /></Layout></ProtectedRoute>} />
           <Route path="/exercises"     element={<ProtectedRoute><Layout><Exercises /></Layout></ProtectedRoute>} />
           <Route path="/routines"      element={<ProtectedRoute><Layout><Routines /></Layout></ProtectedRoute>} />
