@@ -61,3 +61,15 @@ class SessionRepository:
             .where(CompletedSet.session_id == session_id)
         ).all()
         return results
+    def delete(self, session_id: int) -> None:
+        session = self.db.get(WorkoutSession, session_id)
+        if not session:
+            return
+        # Jesse: I added this guys to delete any completed sets for this session first
+        sets = self.db.exec(
+            select(CompletedSet).where(CompletedSet.session_id == session_id)
+        ).all()
+        for s in sets:
+            self.db.delete(s)
+        self.db.delete(session)
+        self.db.commit()
