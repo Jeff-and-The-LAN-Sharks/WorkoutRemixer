@@ -67,3 +67,11 @@ class SessionService:
             )
             for cs, ex in rows
         ]
+    
+    def delete(self, session_id: int, user_id: int) -> None:
+        session = self.repo.get_by_id(session_id)
+        if not session:
+            raise ValueError("Session not found")
+        if session.user_id != user_id:
+            raise PermissionError("Not your session")
+        self.repo.delete(session_id)
