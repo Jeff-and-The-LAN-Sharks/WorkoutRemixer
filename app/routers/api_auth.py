@@ -7,8 +7,8 @@ from app.repositories.user import UserRepository
 from . import api_router
 
 
-@api_router.post("/auth/login")
-async def api_login(credentials: LoginRequest, response: Response, db: SessionDep):
+@api_router.post("/auth/login") #added this endpoint so we can set the cookie from the backend instead of the frontend. 
+async def api_login(credentials: LoginRequest, response: Response, db: SessionDep): 
     repo = UserRepository(db)
     service = AuthService(repo)
     token = service.authenticate_user(credentials.username, credentials.password)
@@ -25,7 +25,7 @@ async def api_login(credentials: LoginRequest, response: Response, db: SessionDe
     return {"access_token": token, "user": UserResponse(id=user.id, username=user.username, email=user.email)}
 
 
-@api_router.post("/auth/register", status_code=status.HTTP_201_CREATED)
+@api_router.post("/auth/register", status_code=status.HTTP_201_CREATED) #Used to create a new user
 async def api_register(data: SignupRequest, db: SessionDep):
     repo = UserRepository(db)
     service = AuthService(repo)
@@ -36,13 +36,13 @@ async def api_register(data: SignupRequest, db: SessionDep):
         raise HTTPException(status_code=400, detail="Username or email already exists")
 
 
-@api_router.post("/auth/logout")
+@api_router.post("/auth/logout") #Added this to clear the cookies when the user logs out.
 async def api_logout(response: Response):
     response.delete_cookie("access_token")
     return {"message": "Logged out"}
 
 
-@api_router.get("/auth/me")
+@api_router.get("/auth/me") #This is used by the frontent to check if the user is logged in
 async def get_me(db: SessionDep, request_obj: None = None):
     from fastapi import Request
     from app.dependencies.auth import get_current_user

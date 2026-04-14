@@ -43,7 +43,7 @@ class SessionRepository:
             self.db.rollback()
             raise
 
-    def add_completed_set(self, completed_set: CompletedSet) -> CompletedSet:
+    def add_completed_set(self, completed_set: CompletedSet) -> CompletedSet: #Adding the try because I had some weird issues with the DB session
         try:
             self.db.add(completed_set)
             self.db.commit()
@@ -54,7 +54,7 @@ class SessionRepository:
             self.db.rollback()
             raise
 
-    def get_sets_for_session(self, session_id: int):
+    def get_sets_for_session(self, session_id: int): # Using the join so the UI can get the exercise details along with the completed set info in one query.
         results = self.db.exec(
             select(CompletedSet, Exercise)
             .join(Exercise, CompletedSet.exercise_id == Exercise.id)
@@ -65,7 +65,6 @@ class SessionRepository:
         session = self.db.get(WorkoutSession, session_id)
         if not session:
             return
-        # Jesse: I added this guys to delete any completed sets for this session first
         sets = self.db.exec(
             select(CompletedSet).where(CompletedSet.session_id == session_id)
         ).all()

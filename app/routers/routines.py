@@ -10,7 +10,7 @@ def _get_service(db) -> RoutineService:
     return RoutineService(RoutineRepository(db))
 
 
-@api_router.get("/routines", response_model=list[RoutineResponse])
+@api_router.get("/routines", response_model=list[RoutineResponse]) #This endpoint allows users to see a list of their routines. 
 async def list_routines(db: SessionDep, user: AuthDep):
     return _get_service(db).get_user_routines(user.id)
 
@@ -30,7 +30,7 @@ async def create_routine(data: RoutineCreate, db: SessionDep, user: AuthDep):
     return _get_service(db).create(data, user.id)
 
 
-@api_router.put("/routines/{routine_id}", response_model=RoutineResponse)
+@api_router.put("/routines/{routine_id}", response_model=RoutineResponse) #User can update the name and description of their routine here. 
 async def update_routine(routine_id: int, data: RoutineUpdate, db: SessionDep, user: AuthDep):
     try:
         return _get_service(db).update(routine_id, data, user.id)
@@ -40,7 +40,7 @@ async def update_routine(routine_id: int, data: RoutineUpdate, db: SessionDep, u
         raise HTTPException(status_code=403, detail="Not authorized")
 
 
-@api_router.delete("/routines/{routine_id}", status_code=status.HTTP_204_NO_CONTENT)
+@api_router.delete("/routines/{routine_id}", status_code=status.HTTP_204_NO_CONTENT) #ALlows user to delete a routine. (Remember to add a confirmation prompt on the frontend)
 async def delete_routine(routine_id: int, db: SessionDep, user: AuthDep):
     try:
         _get_service(db).delete(routine_id, user.id)
@@ -50,7 +50,7 @@ async def delete_routine(routine_id: int, db: SessionDep, user: AuthDep):
         raise HTTPException(status_code=403, detail="Not authorized")
 
 
-@api_router.post("/routines/{routine_id}/exercises", status_code=status.HTTP_201_CREATED)
+@api_router.post("/routines/{routine_id}/exercises", status_code=status.HTTP_201_CREATED) #Allows users to add an exercise to their routine.
 async def add_exercise_to_routine(routine_id: int, data: RoutineExerciseCreate, db: SessionDep, user: AuthDep):
     try:
         return _get_service(db).add_exercise(routine_id, data, user.id)
@@ -60,7 +60,7 @@ async def add_exercise_to_routine(routine_id: int, data: RoutineExerciseCreate, 
         raise HTTPException(status_code=403, detail="Not authorized")
 
 
-@api_router.delete("/routines/{routine_id}/exercises/{routine_exercise_id}", status_code=status.HTTP_204_NO_CONTENT)
+@api_router.delete("/routines/{routine_id}/exercises/{routine_exercise_id}", status_code=status.HTTP_204_NO_CONTENT) #Allows users to remove the exericses from their routine. (Remember to add a confirmation prompt on the frontend)
 async def remove_exercise_from_routine(routine_id: int, routine_exercise_id: int, db: SessionDep, user: AuthDep):
     try:
         _get_service(db).remove_exercise(routine_id, routine_exercise_id, user.id)

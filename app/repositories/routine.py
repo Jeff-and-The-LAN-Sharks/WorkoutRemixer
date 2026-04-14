@@ -20,6 +20,7 @@ class RoutineRepository:
     def get_by_id(self, routine_id: int) -> Optional[Routine]:
         return self.db.get(Routine, routine_id)
 
+    #Wrapped create and update in try/except blocks so that it rolls back if it fails so the DB session doesn't get permanently locked up.
     def create(self, routine: Routine) -> Routine:
         try:
             self.db.add(routine)
@@ -44,7 +45,7 @@ class RoutineRepository:
 
     def delete(self, routine_id: int):
         try:
-            # 1. Delete completed sets linked to sessions of this routine
+            #Delete completed sets linked to sessions of this routine
             sessions = self.db.exec(
                 select(WorkoutSession).where(WorkoutSession.routine_id == routine_id)
             ).all()
@@ -56,14 +57,14 @@ class RoutineRepository:
                     self.db.delete(s)
                 self.db.delete(session)
 
-            # 2. Delete routine exercises
+            #Delete routine exercises
             routine_exercises = self.db.exec(
                 select(RoutineExercise).where(RoutineExercise.routine_id == routine_id)
             ).all()
             for re in routine_exercises:
                 self.db.delete(re)
 
-            # 3. Delete the routine itself
+            #Delete the routine itself
             routine = self.db.get(Routine, routine_id)
             if routine:
                 self.db.delete(routine)
@@ -96,6 +97,7 @@ class RoutineRepository:
             self.db.rollback()
             raise
 
+    # Using a the inner join here so the UI can get the actual Exercise details (name, muscle group) 
     def get_routine_exercises(self, routine_id: int):
         results = self.db.exec(
             select(RoutineExercise, Exercise)

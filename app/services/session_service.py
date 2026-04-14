@@ -7,7 +7,7 @@ class SessionService:
     def __init__(self, repo: SessionRepository):
         self.repo = repo
 
-    def create(self, data: SessionCreate, user_id: int) -> SessionResponse:
+    def create(self, data: SessionCreate, user_id: int) -> SessionResponse: #This creeates a new workout session when the user starts a workout and it can be used to track the duration and sets completed for that workout.
         session = WorkoutSession(user_id=user_id, routine_id=data.routine_id)
         saved = self.repo.create(session)
         return SessionResponse(
@@ -16,7 +16,7 @@ class SessionService:
             completed=saved.completed, sets=[]
         )
 
-    def complete(self, session_id: int, duration_seconds: int, user_id: int) -> SessionResponse:
+    def complete(self, session_id: int, duration_seconds: int, user_id: int) -> SessionResponse: #This us used to mark the session as complete and log the duration of the workout when user finished the workout. 
         session = self.repo.get_by_id(session_id)
         if not session:
             raise ValueError("Session not found")
@@ -32,7 +32,7 @@ class SessionService:
             completed=saved.completed, sets=sets
         )
 
-    def add_set(self, session_id: int, data: CompletedSetCreate, user_id: int):
+    def add_set(self, session_id: int, data: CompletedSetCreate, user_id: int): #We log the sets using this method which can be used to track user's progress.
         session = self.repo.get_by_id(session_id)
         if not session or session.user_id != user_id:
             raise PermissionError("Invalid session")
@@ -45,7 +45,7 @@ class SessionService:
         )
         return self.repo.add_completed_set(completed_set)
 
-    def get_history(self, user_id: int) -> list[SessionResponse]:
+    def get_history(self, user_id: int) -> list[SessionResponse]: #Simple method to get the user's workout session history which can be displayed on the dashboard or a profile page depending on what Chris decides.
         sessions = self.repo.get_by_user(user_id)
         result = []
         for s in sessions:

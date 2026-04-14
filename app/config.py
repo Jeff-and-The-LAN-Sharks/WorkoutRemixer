@@ -5,7 +5,7 @@ from functools import lru_cache
 def get_settings():
     return Settings()
 
-class Settings(BaseSettings): 
+class Settings(BaseSettings):
     database_uri: str
     secret_key: str
     env: str

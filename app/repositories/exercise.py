@@ -5,7 +5,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+#Fellas please remember to pass the DB session down here.
+#I spend too much time trying to figure out why it wasn't working.
 class ExerciseRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -16,6 +17,8 @@ class ExerciseRepository:
     def get_by_id(self, exercise_id: int) -> Optional[Exercise]:
         return self.db.get(Exercise, exercise_id)
 
+    #can we get muscles by category? like "arms" instead of "bicep"?
+    #No, just map it on the frontend cus it doesn't matter too much.
     def get_by_muscle_group(self, muscle_group: str) -> list[Exercise]:
         return self.db.exec(
             select(Exercise).where(Exercise.muscle_group == muscle_group)
@@ -41,5 +44,3 @@ class ExerciseRepository:
         return self.db.exec(
             select(Exercise).where(Exercise.name == name)
         ).first() is not None
-
-#the repos are complete

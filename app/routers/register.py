@@ -16,6 +16,7 @@ async def register_view(request: Request):
     )
 
 # make sure and use the post route for things that can change like actions
+# Alr king
 @router.post('/register', response_class=HTMLResponse, status_code=status.HTTP_201_CREATED)
 def signup_user(request:Request, db:SessionDep, 
     username: str = Form(),

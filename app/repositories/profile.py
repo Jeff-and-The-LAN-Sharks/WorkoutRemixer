@@ -2,7 +2,6 @@ from sqlmodel import Session, select
 from app.models.profile import UserProfile
 from typing import Optional
 
-
 class ProfileRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -12,6 +11,8 @@ class ProfileRepository:
             select(UserProfile).where(UserProfile.user_id == user_id)
         ).first()
 
+    #Do we need a profile picture URL here? The frontend is just showing a grey circle.
+    # Just use a default image in React, I'm not dealing with the image uploading nonsense in the backend.
     def get_or_create(self, user_id: int) -> UserProfile:
         profile = self.get_by_user(user_id)
         if not profile:

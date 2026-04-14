@@ -19,7 +19,7 @@ async def list_exercises(
     return service.search(query=q, muscle_group=muscle_group)
 
 
-@api_router.get("/exercises/{exercise_id}", response_model=ExerciseResponse)
+@api_router.get("/exercises/{exercise_id}", response_model=ExerciseResponse) #Allows the users to get the details on a specific exercise.
 async def get_exercise(exercise_id: int, db: SessionDep, user: AuthDep):
     repo = ExerciseRepository(db)
     service = ExerciseService(repo)
@@ -29,7 +29,7 @@ async def get_exercise(exercise_id: int, db: SessionDep, user: AuthDep):
         raise HTTPException(status_code=404, detail="Exercise not found")
 
 
-@api_router.post("/exercises", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
+@api_router.post("/exercises", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED) #Allows users to create a new exercise.
 async def create_exercise(data: ExerciseCreate, db: SessionDep, user: AuthDep):
     repo = ExerciseRepository(db)
     service = ExerciseService(repo)

@@ -22,7 +22,7 @@ class RoutineService:
             ))
         return result
 
-    def get_by_id(self, routine_id: int, user_id: int) -> RoutineResponse:
+    def get_by_id(self, routine_id: int, user_id: int) -> RoutineResponse: #This method gets the details of a specific routine and it cane be used on the routine detail page. 
         routine = self.repo.get_by_id(routine_id)
         if not routine:
             raise ValueError("Routine not found")
@@ -38,7 +38,7 @@ class RoutineService:
             exercises=exercises
         )
 
-    def create(self, data: RoutineCreate, user_id: int) -> RoutineResponse:
+    def create(self, data: RoutineCreate, user_id: int) -> RoutineResponse: 
         routine = Routine(name=data.name, description=data.description, user_id=user_id)
         saved = self.repo.create(routine)
         return RoutineResponse(
@@ -79,7 +79,7 @@ class RoutineService:
             raise PermissionError("Not your routine")
         self.repo.delete(routine_id)
 
-    def add_exercise(self, routine_id: int, data: RoutineExerciseCreate, user_id: int):
+    def add_exercise(self, routine_id: int, data: RoutineExerciseCreate, user_id: int): #Allows users to add exercises to their routine and specify the details for each exercise (sets, reps, rest time, and whatever else we want to add.)
         routine = self.repo.get_by_id(routine_id)
         if not routine:
             raise ValueError("Routine not found")
