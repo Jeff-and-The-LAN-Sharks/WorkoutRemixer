@@ -8,7 +8,7 @@ from app.utilities.flash import flash
 from app.config import get_settings
 
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/login", response_class=HTMLResponse) 
 async def login_view(request: Request):
     return templates.TemplateResponse(
         request=request, 

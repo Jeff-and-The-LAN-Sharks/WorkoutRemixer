@@ -8,7 +8,7 @@ from . import api_router
 def _repo(db) -> HealthLogRepository:
     return HealthLogRepository(db)
 
-
+ 
 @api_router.get("/health/today", response_model=DailyLogResponse)
 async def get_today(db: SessionDep, user: AuthDep):
     return _repo(db).get_or_create_today(user.id)

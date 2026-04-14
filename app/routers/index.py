@@ -5,7 +5,7 @@ from app.dependencies.session import SessionDep
 from . import router
 
 
-@router.get("/", response_class=RedirectResponse)
+@router.get("/", response_class=RedirectResponse) #This is the index route, it will redirect users to the appropriate page based on their login status and role (admin or regular user).
 async def index_view(
     request: Request,
     user_logged_in: IsUserLoggedIn,

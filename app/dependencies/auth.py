@@ -7,7 +7,7 @@ from app.models.user import User
 from app.dependencies.session import SessionDep
 from app.repositories.user import UserRepository
 
-async def get_current_user(request:Request, db:SessionDep)->User:
+async def get_current_user(request:Request, db:SessionDep)->User: #This function is used to get the current user
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

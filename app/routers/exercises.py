@@ -7,7 +7,7 @@ from app.schemas.exercise import ExerciseCreate, ExerciseResponse
 from . import api_router
 
 
-@api_router.get("/exercises", response_model=list[ExerciseResponse])
+@api_router.get("/exercises", response_model=list[ExerciseResponse]) #This endpoint allows users to search for exercises, with optional query parameters for filtering by name or muscle group.
 async def list_exercises(
     db: SessionDep,
     user: AuthDep,

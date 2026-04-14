@@ -19,3 +19,7 @@ class CompletedSet(SQLModel, table=True):
     reps_completed: int = 0
     form_score: float = 0.0
     set_number: int = 1
+
+
+    #If we want to track more details about each set (like weight used, or notes), we can add more fields here later. 
+    #For now, this should cover the basics of tracking completed sets within a workout session.

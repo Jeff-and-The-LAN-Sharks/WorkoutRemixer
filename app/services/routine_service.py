@@ -7,7 +7,7 @@ class RoutineService:
     def __init__(self, repo: RoutineRepository):
         self.repo = repo
 
-    def get_user_routines(self, user_id: int) -> list[RoutineResponse]:
+    def get_user_routines(self, user_id: int) -> list[RoutineResponse]: #This method gets all the routines for the user and can be used to display them on the dashboard.
         routines = self.repo.get_by_user(user_id)
         result = []
         for r in routines:

@@ -10,3 +10,5 @@ class UserProfile(SQLModel, table=True):
     age: Optional[int] = None
     gender: str = "male"
     activity_level: str = "moderate"
+
+# The UserProfile model is designed to store additional information about the user that can be used for personalized workout recommendations and tracking.

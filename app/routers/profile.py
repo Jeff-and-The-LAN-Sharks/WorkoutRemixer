@@ -4,7 +4,7 @@ from app.schemas.profile import ProfileResponse, ProfileUpdate
 from . import api_router
 
 
-@api_router.get("/profile", response_model=ProfileResponse)
+@api_router.get("/profile", response_model=ProfileResponse) 
 async def get_profile(db: SessionDep, user: AuthDep):
     return ProfileRepository(db).get_or_create(user.id)
 

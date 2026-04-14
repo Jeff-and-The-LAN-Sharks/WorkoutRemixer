@@ -10,4 +10,4 @@ class Exercise(SQLModel, table=True):
     difficulty: str = "beginner"
     video_id: str = ""
 
-#models are good we should add a one for healthlog tho
+#models are good we should add one for healthlog tho

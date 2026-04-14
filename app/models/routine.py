@@ -19,3 +19,5 @@ class RoutineExercise(SQLModel, table=True):
     target_reps: int = 10
     rest_seconds: int = 60
     order_index: int = 0
+
+# routines is fine for now, we can add more fields later if needed
