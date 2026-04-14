@@ -14,20 +14,6 @@ function formatDate(iso) {
   })
 }
 
-function FormScore({ score }) {
-  const color = score >= 80 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)'
-  return (
-    <div style={{
-      width: 44, height: 44, borderRadius: '50%',
-      border: `2px solid ${color}`,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: '12px', fontWeight: 600, color, flexShrink: 0,
-    }}>
-      {Math.round(score)}
-    </div>
-  )
-}
-
 export default function History() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -39,25 +25,17 @@ export default function History() {
 
   const completed = sessions.filter(s => s.completed)
   const totalReps = completed.reduce((acc, s) => acc + s.sets.reduce((a, set) => a + set.reps_completed, 0), 0)
-  const avgForm = completed.length
-    ? Math.round(completed.reduce((acc, s) => {
-        const avg = s.sets.length ? s.sets.reduce((a, set) => a + set.form_score, 0) / s.sets.length : 0
-        return acc + avg
-      }, 0) / completed.length)
-    : 0
 
   return (
     <div className="page">
       <h1 className="page-title">Workout History</h1>
       <p className="page-sub">Track your progress over time.</p>
 
-      {}
       {completed.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '28px' }}>
           {[
             { label: 'Workouts completed', value: completed.length },
             { label: 'Total reps logged', value: totalReps },
-            
           ].map(({ label, value }) => (
             <div key={label} style={{
               background: 'var(--surface)', border: '1px solid var(--border)',
@@ -84,18 +62,13 @@ export default function History() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {sessions.map(session => {
-            const avgScore = session.sets.length
-              ? session.sets.reduce((a, s) => a + s.form_score, 0) / session.sets.length
-              : 0
             const isOpen = expanded === session.id
-
             return (
               <div key={session.id} className="card" style={{ overflow: 'hidden' }}>
                 <div
                   style={{ display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
                   onClick={() => setExpanded(isOpen ? null : session.id)}
                 >
-                  
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
                       <span style={{ fontSize: '15px', fontWeight: 600 }}>
@@ -148,12 +121,6 @@ export default function History() {
                           <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
                             <span style={{ color: 'var(--text)', fontWeight: 500 }}>{set.reps_completed}</span> reps
                           </span>
-                          <div style={{
-                            fontSize: '12px', fontWeight: 600, minWidth: '40px', textAlign: 'right',
-                            color: set.form_score >= 80 ? 'var(--green)' : set.form_score >= 50 ? 'var(--yellow)' : 'var(--red)',
-                          }}>
-                            {Math.round(set.form_score)}%
-                          </div>
                         </div>
                       ))}
                     </div>

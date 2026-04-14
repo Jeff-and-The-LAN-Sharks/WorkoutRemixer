@@ -28,9 +28,7 @@ export default function Routines() {
     }
   }
 
-  const handleDelete = async (e, id) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleDelete = async (id) => {
     if (!confirm('Delete this routine?')) return
     await api.delete(`/routines/${id}`)
     setRoutines(r => r.filter(x => x.id !== id))
@@ -63,46 +61,46 @@ export default function Routines() {
       ) : (
         <div className="grid-2">
           {routines.map(r => (
-            <Link key={r.id} to={`/routines/${r.id}`} style={{ textDecoration: 'none' }}>
-              <div
-                className="card"
-                style={{ cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.transform = '' }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>{r.name}</h3>
-                    {r.description && (
-                      <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '14px', lineHeight: 1.5 }}>
-                        {r.description}
-                      </p>
+            <div key={r.id} style={{ position: 'relative' }}>
+              <Link to={`/routines/${r.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <div
+                  className="card"
+                  style={{ cursor: 'pointer', transition: 'border-color 0.15s, transform 0.15s', paddingRight: 56 }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.transform = '' }}
+                >
+                  <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>{r.name}</h3>
+                  {r.description && (
+                    <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '14px', lineHeight: 1.5 }}>
+                      {r.description}
+                    </p>
+                  )}
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                      {r.exercises.length} exercise{r.exercises.length !== 1 ? 's' : ''}
+                    </span>
+                    {r.exercises.length > 0 && (
+                      <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                        {[...new Set(r.exercises.map(e => e.muscle_group))].slice(0, 3).map(mg => (
+                          <span key={mg} className="badge badge-purple">{mg}</span>
+                        ))}
+                      </div>
                     )}
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                        {r.exercises.length} exercise{r.exercises.length !== 1 ? 's' : ''}
-                      </span>
-                      {r.exercises.length > 0 && (
-                        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                          {[...new Set(r.exercises.map(e => e.muscle_group))].slice(0, 3).map(mg => (
-                            <span key={mg} className="badge badge-purple">{mg}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
                   </div>
-                  <button
-                    className="btn btn-danger"
-                    style={{ padding: '5px 10px', marginLeft: '12px', flexShrink: 0 }}
-                    onClick={(e) => handleDelete(e, r.id)}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 6h18M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                    </svg>
-                  </button>
                 </div>
-              </div>
-            </Link>
+              </Link>
+
+              {/* Delete button outside the Link */}
+              <button
+                className="btn btn-danger"
+                style={{ position: 'absolute', top: 16, right: 16, padding: '5px 10px', zIndex: 1 }}
+                onClick={() => handleDelete(r.id)}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M3 6h18M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                </svg>
+              </button>
+            </div>
           ))}
         </div>
       )}
